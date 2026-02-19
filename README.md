@@ -1,16 +1,40 @@
-# React + Vite
+# JuriModelos ⚖️
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+O **JuriModelos** é uma ferramenta jurídica.
 
-Currently, two official plugins are available:
+## 🚀 Funcionalidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **CRUD de Modelos:** Criação, edição, listagem e exclusão de modelos jurídicos.
+- **Motor de Substituição (Replace):** Identifica tags como `{{nome_cliente}}` no texto e as substitui por dados reais.
+- **Formulários Dinâmicos:** (Em desenvolvimento) Geração automática de inputs baseada nas variáveis do modelo.
+- **Persistência:** Integração com banco de dados PostgreSQL (via Neon) utilizando Sequelize.
 
-## React Compiler
+## 🛠️ Tecnologias Utilizadas
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Back-end
+- [Node.js](https://nodejs.org/)
+- [Express](https://expressjs.com/)
+- [Sequelize (ORM)](https://sequelize.org/)
+- [PostgreSQL](https://www.postgresql.org/)
 
-## Expanding the ESLint configuration
+### Front-end
+- [React](https://reactjs.org/)
+- [Axios](https://axios-http.com/)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📋 Estrutura da API (Endpoints)
+
+| Método | Rota | Descrição |
+| :--- | :--- | :--- |
+| `GET` | `/api/modelos` | Lista todos os modelos (ordenados por criação). |
+| `GET` | `/api/modelos/:id` | Busca detalhes de um modelo específico. |
+| `POST` | `/api/modelos` | Cadastra um novo modelo. |
+| `PUT` | `/api/modelos/:id` | Atualiza um modelo existente. |
+| `DELETE` | `/api/modelos/:id` | Remove um modelo do sistema. |
+| `POST` | `/api/modelos/:id/generate` | Gera o texto final substituindo as variáveis `{{ }}`. |
+
+## 🔧 Como Rodar o Projeto
+
+1. **Clone os repositórios:**
+   ```bash
+   git clone [https://github.com/DavidWanderley/JuriModelos-api](https://github.com/DavidWanderley/JuriModelos-api)
+   git clone [https://github.com/DavidWanderley/JuriModelos-app](https://github.com/DavidWanderley/JuriModelos-app)

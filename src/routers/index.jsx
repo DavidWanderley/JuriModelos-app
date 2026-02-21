@@ -1,18 +1,33 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Login from '../pages/Login';
 import Home from '../pages/Home';
-// Vamos deixar a página de geração preparada, mesmo que ainda não a tenhamos criado
-import GenerateDocument from '../pages/GenerateDocument'; 
+import GenerateDocument from '../pages/GenerateDocument';
 
-const AppRoutes = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/generate/:id" element={<GenerateDocument />} />
-      </Routes>
-    </BrowserRouter>
-  );
+// Simulação de autenticação
+const isAuthenticated = () => {
+  return localStorage.getItem('token') !== null;
 };
+
+const PrivateRoute = ({ children }) => {
+  return isAuthenticated() ? children : <Navigate to="/login" />;
+};
+
+const AppRoutes = () => (
+  <Routes>
+    <Route path="/login" element={<Login />} />
+    
+    <Route path="/" element={
+      <PrivateRoute>
+        <Home />
+      </PrivateRoute>
+    } />
+    
+    <Route path="/generate/:id" element={
+      <PrivateRoute>
+        <GenerateDocument />
+      </PrivateRoute>
+    } />
+  </Routes>
+);
 
 export default AppRoutes;

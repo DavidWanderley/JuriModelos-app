@@ -1,0 +1,32 @@
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px;
+}
+
+.content {
+  flex: 1;
+  background-color: #f4f7f6;
+  padding: 40px;
+}
+
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar nav li {
+  margin: 20px 0;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.sidebar nav li:hover {
+  opacity: 1;
+}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Importe para navegar
+import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import ModelCard from "../components/ModelCard";
 import "../styles/Home.css";
@@ -22,7 +22,6 @@ const Home = () => {
     fetchModelos();
   }, []);
 
-  // Lógica de Filtro (Busca + Categoria)
   const modelosFiltrados = modelos.filter((m) => {
     const matchBusca = m.titulo.toLowerCase().includes(busca.toLowerCase());
     const matchCategoria =
@@ -32,8 +31,7 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      {/* 1. Header de Estatísticas */}
-      <button className="btn-new-model" onClick={() => navigate("/new")}>
+      <button className="btn-new-model" onClick={() => navigate("/novo-Modelo")}>
         + Novo Modelo
       </button>
       <div className="stats-container">
@@ -50,7 +48,6 @@ const Home = () => {
           <p>Seu Acesso</p>
         </div>
       </div>
-      {/* 2. Barra de Busca */}
       <div className="search-section">
         <input
           type="text"
@@ -59,7 +56,6 @@ const Home = () => {
           onChange={(e) => setBusca(e.target.value)}
         />
       </div>
-      {/* 3. Filtros de Categoria */}
       <div className="category-filters">
         {["Todos", "Contratos", "Petições", "Recursos", "Pareceres"].map(
           (cat) => (
@@ -73,7 +69,6 @@ const Home = () => {
           ),
         )}
       </div>
-      {/* 4. Grid de Modelos com Navegação Real */}
       <div className="model-grid">
         {modelosFiltrados.map((m) => (
           <ModelCard

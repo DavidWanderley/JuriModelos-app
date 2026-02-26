@@ -1,6 +1,8 @@
-import React from 'react';
-import AppRoutes from './routers'; 
-import './styles/App.css';
+import React from "react";
+import AppRoutes from "./routers";
+import Sidebar from "./components/Sidebar"; // Certifique-se de criar estes componentes
+import Header from "./components/Header";
+import "./styles/App.css";
 
 function App() {
   return (

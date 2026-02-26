@@ -10,10 +10,9 @@ const CreateModel = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Envia para a rota POST que testamos no Postman
       await api.post('/modelos', dados);
       alert('Modelo jurídico salvo com sucesso!');
-      navigate('/'); // Volta para o Dashboard
+      navigate('/'); 
     } catch (error) {
       console.error("Erro ao salvar:", error);
       alert('Erro ao conectar com o servidor.');

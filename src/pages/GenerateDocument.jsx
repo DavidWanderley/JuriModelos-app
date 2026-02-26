@@ -13,7 +13,6 @@ const GenerateDocument = () => {
   useEffect(() => {
     api.get(`/modelos/${id}`).then((res) => {
       setModel(res.data);
-      // Cria um estado inicial para cada variável encontrada no modelo
       const fields = {};
       res.data.variaveis.forEach((v) => (fields[v] = ""));
       setFormData(fields);
@@ -35,15 +34,12 @@ const GenerateDocument = () => {
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
 
-    // Configurações de fonte para padrão jurídico
     doc.setFont("times", "normal");
     doc.setFontSize(12);
 
-    // Adiciona o texto com quebra de linha automática
     const splitText = doc.splitTextToSize(documentoFinal, 180);
     doc.text(splitText, 15, 20);
 
-    // Salva o arquivo com o título do modelo
     doc.save(`${model.titulo}.pdf`);
   };
 

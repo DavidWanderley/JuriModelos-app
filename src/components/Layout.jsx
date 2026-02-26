@@ -1,32 +1,18 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../styles/Layout.css';
+import Sidebar from './Sidebar';
+import Header from './Header';
 
 const Layout = ({ children }) => {
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/login');
-    };
-
-    return (
-        <div className="app-layout">
-            <aside className="sidebar">
-                <h2>JuriModelos</h2>
-                <nav>
-                    <ul>
-                        <li onClick={() => navigate('/')}>Dashboard</li>
-                        <li onClick={() => navigate('/modelos/novo')}>Novo Modelo</li>
-                        <li onClick={handleLogout} style={{color: '#e74c3c'}}>Sair</li>
-                    </ul>
-                </nav>
-            </aside>
-            <main className="content">
-                {children}
-            </main>
-        </div>
-    );
+  return (
+    <div className="flex min-h-screen bg-slate-50">
+      <Sidebar />
+      <div className="flex-1 ml-64 flex flex-col">
+        <Header />
+        <main className="p-8 mt-16">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
 };
 
 export default Layout;

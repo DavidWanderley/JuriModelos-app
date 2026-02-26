@@ -1,5 +1,5 @@
 import React from 'react';
-import AppRoutes from './routers'; // Importa o arquivo da pasta routers
+import AppRoutes from './routers'; 
 import './styles/App.css';
 
 function App() {

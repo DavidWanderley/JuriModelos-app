@@ -11,30 +11,32 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  e.preventDefault();
+  setLoading(true);
+  setError('');
 
-    try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
-        email,
-        password
-      });
+  try {
+    const response = await axios.post('http://localhost:5000/api/auth/login', {
+      email,
+      password
+    });
 
-      localStorage.setItem('token', response.data.token);
-      navigate('/');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Erro ao conectar com o servidor.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    localStorage.setItem('token', response.data.token);
+    localStorage.setItem('user', JSON.stringify(response.data.user));
+    
+    navigate('/');
+    
+  } catch (err) {
+    const message = err.response?.data?.message || 'Erro ao conectar com o servidor.';
+    setError(message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex min-h-screen font-sans">
-      {/* LADO ESQUERDO: PROPAGANDA (Ajustado) */}
       <div className="hidden lg:flex w-1/2 bg-[#0e1e3f] text-white p-16 flex-col justify-between relative overflow-hidden">
-        {/* Detalhe decorativo sutil ao fundo */}
         <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-amber-500/10 rounded-full blur-3xl"></div>
         
         <div className="relative z-10">
@@ -44,7 +46,6 @@ const Login = () => {
           </p>
         </div>
 
-        {/* Itens de Propaganda como "Mini Cards" */}
         <div className="space-y-6 relative z-10">
           <div className="flex gap-5 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
             <div className="flex-shrink-0 w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center text-2xl">
@@ -82,7 +83,6 @@ const Login = () => {
         </div>
       </div>
 
-      {/* LADO DIREITO: FORMULÁRIO (Mantido com melhorias de foco) */}
       <div className="w-full lg:w-1/2 bg-white flex items-center justify-center p-8 lg:p-24">
         <div className="max-w-md w-full">
           <div className="lg:hidden mb-8">

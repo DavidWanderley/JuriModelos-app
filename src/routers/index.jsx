@@ -3,18 +3,18 @@ import Login from '../pages/Login';
 import Home from '../pages/Home';
 import GenerateDocument from '../pages/GenerateDocument';
 import CreateModel from '../pages/CreateModel'; 
-import Layout from '../components/Layout'; // O novo componente
+import Layout from '../components/Layout'; 
 
 const isAuthenticated = () => {
-  return localStorage.getItem('token') !== null;
+  const token = localStorage.getItem('token');
+  return token !== null && token !== "" && token !== "undefined";
 };
 
-// Modificamos o PrivateRoute para envolver o conteúdo no Layout
 const PrivateRoute = ({ children }) => {
   return isAuthenticated() ? (
     <Layout>{children}</Layout> 
   ) : (
-    <Navigate to="/login" />
+    <Navigate to="/login" replace /> 
   );
 };
 

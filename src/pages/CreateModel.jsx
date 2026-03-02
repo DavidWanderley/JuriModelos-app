@@ -14,6 +14,7 @@ const CreateModel = () => {
     base_legal: "",
     tags: "",
     data_audiencia: "",
+    hora_audiencia: "",
   });
 
   const [arquivo, setArquivo] = useState(null);
@@ -26,7 +27,6 @@ const CreateModel = () => {
 
     try {
       const formData = new FormData();
-
       Object.keys(dados).forEach((key) => {
         formData.append(key, dados[key]);
       });
@@ -36,7 +36,6 @@ const CreateModel = () => {
       }
 
       await api.post("/modelos", formData);
-
       alert("Modelo e PDF salvos com sucesso!");
       navigate("/");
     } catch (error) {
@@ -50,7 +49,7 @@ const CreateModel = () => {
   return (
     <div className="ml-44 pt-24 p-10 bg-slate-50 min-h-screen">
       <div className="max-w-5xl bg-white p-12 rounded-[2.5rem] shadow-sm border border-slate-200">
-        <header className="mb-10">
+        <header className="mb-6">
           <h1 className="text-3xl font-black text-slate-800 mb-2">
             Engenharia de Modelo
           </h1>
@@ -58,6 +57,10 @@ const CreateModel = () => {
             Configurando inteligência para o acervo da CW Advocacia.
           </p>
         </header>
+
+        <p className="text-rose-500 text-sm font-bold mb-10 flex items-center gap-1">
+          <span className="text-lg">*</span> Campos obrigatórios para o acervo
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-10">
           <section className="space-y-6">
@@ -67,7 +70,7 @@ const CreateModel = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
                 <label className="block text-sm font-bold text-slate-700 mb-2">
-                  TÍTULO DA PEÇA
+                  TÍTULO DA PEÇA <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -82,10 +85,11 @@ const CreateModel = () => {
               </div>
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">
-                  CATEGORIA
+                  CATEGORIA <span className="text-rose-500">*</span>
                 </label>
                 <select
                   className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 outline-none text-xl bg-white"
+                  required
                   value={dados.categoria}
                   onChange={(e) =>
                     setDados({ ...dados, categoria: e.target.value })
@@ -118,18 +122,36 @@ const CreateModel = () => {
                   </button>
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">
-                  DATA E HORA DA AUDIÊNCIA
-                </label>
-                <input
-                  type="datetime-local"
-                  className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 outline-none text-xl bg-white transition-all"
-                  value={dados.data_audiencia}
-                  onChange={(e) =>
-                    setDados({ ...dados, data_audiencia: e.target.value })
-                  }
-                />
+              
+              <div className="bg-amber-50/50 p-6 rounded-3xl grid grid-cols-1 md:grid-cols-2 gap-6 border border-amber-100 mb-8">
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-black uppercase text-amber-700 px-2">
+                    Data da Audiência
+                  </label>
+                  <input
+                    type="date"
+                    name="data_audiencia"
+                    value={dados.data_audiencia}
+                    onChange={(e) =>
+                      setDados({ ...dados, data_audiencia: e.target.value })
+                    }
+                    className="bg-white border-amber-200 border p-3 rounded-xl outline-none font-bold text-slate-700"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-black uppercase text-amber-700 px-2">
+                    Hora da Audiência
+                  </label>
+                  <input
+                    type="time"
+                    name="hora_audiencia"
+                    value={dados.hora_audiencia}
+                    onChange={(e) =>
+                      setDados({ ...dados, hora_audiencia: e.target.value })
+                    }
+                    className="bg-white border-amber-200 border p-3 rounded-xl outline-none font-bold text-slate-700"
+                  />
+                </div>
               </div>
             </div>
           </section>
@@ -140,15 +162,11 @@ const CreateModel = () => {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">
-                  JURISDIÇÃO
-                </label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">JURISDIÇÃO</label>
                 <select
                   className="w-full px-5 py-4 rounded-xl border border-slate-200 text-lg bg-white"
                   value={dados.jurisdicao}
-                  onChange={(e) =>
-                    setDados({ ...dados, jurisdicao: e.target.value })
-                  }
+                  onChange={(e) => setDados({ ...dados, jurisdicao: e.target.value })}
                 >
                   <option value="Estadual">Justiça Estadual</option>
                   <option value="Federal">Justiça Federal</option>
@@ -157,15 +175,11 @@ const CreateModel = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">
-                  COMPLEXIDADE
-                </label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">COMPLEXIDADE</label>
                 <select
                   className="w-full px-5 py-4 rounded-xl border border-slate-200 text-lg bg-white"
                   value={dados.complexidade}
-                  onChange={(e) =>
-                    setDados({ ...dados, complexidade: e.target.value })
-                  }
+                  onChange={(e) => setDados({ ...dados, complexidade: e.target.value })}
                 >
                   <option value="Baixa">Baixa (Padrão)</option>
                   <option value="Média">Média (Requer atenção)</option>
@@ -173,17 +187,13 @@ const CreateModel = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">
-                  BASE LEGAL PRINCIPAL
-                </label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">BASE LEGAL PRINCIPAL</label>
                 <input
                   type="text"
                   placeholder="Ex: Art. 186 CC"
                   className="w-full px-5 py-4 rounded-xl border border-slate-200 text-lg"
                   value={dados.base_legal}
-                  onChange={(e) =>
-                    setDados({ ...dados, base_legal: e.target.value })
-                  }
+                  onChange={(e) => setDados({ ...dados, base_legal: e.target.value })}
                 />
               </div>
             </div>
@@ -199,25 +209,9 @@ const CreateModel = () => {
                 <span className="text-lg font-bold text-slate-700 block">
                   {arquivo ? arquivo.name : "Upload de PDF (Exemplo Real)"}
                 </span>
-                <span className="text-sm text-slate-400">
-                  Clique para selecionar ou arraste o arquivo
-                </span>
-                <input
-                  type="file"
-                  accept=".pdf"
-                  className="hidden"
-                  onChange={(e) => setArquivo(e.target.files[0])}
-                />
+                <span className="text-sm text-slate-400">Clique para selecionar</span>
+                <input type="file" accept=".pdf" className="hidden" onChange={(e) => setArquivo(e.target.files[0])} />
               </label>
-              {arquivo && (
-                <button
-                  type="button"
-                  onClick={() => setArquivo(null)}
-                  className="mt-4 text-xs font-bold text-red-500 uppercase tracking-widest hover:underline"
-                >
-                  Remover arquivo
-                </button>
-              )}
             </div>
           </section>
 
@@ -227,39 +221,33 @@ const CreateModel = () => {
             </h2>
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-2">
-                DESCRIÇÃO RÁPIDA (PARA O DASHBOARD)
+                DESCRIÇÃO RÁPIDA
               </label>
               <input
                 type="text"
                 placeholder="Ex: Usar quando houver negativa de cirurgia urgente."
                 className="w-full px-5 py-4 rounded-xl border border-slate-200 text-lg"
                 value={dados.descricao}
-                onChange={(e) =>
-                  setDados({ ...dados, descricao: e.target.value })
-                }
+                onChange={(e) => setDados({ ...dados, descricao: e.target.value })}
               />
             </div>
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-2">
-                TEXTO BASE DO MODELO
+                TEXTO BASE DO MODELO <span className="text-rose-500">*</span>
               </label>
               <textarea
                 className="w-full px-6 py-5 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-amber-500 outline-none text-lg min-h-[400px] font-serif leading-relaxed"
                 required
                 placeholder="EXCELENTÍSSIMO SENHOR DOUTOR JUIZ..."
                 value={dados.conteudo}
-                onChange={(e) =>
-                  setDados({ ...dados, conteudo: e.target.value })
-                }
+                onChange={(e) => setDados({ ...dados, conteudo: e.target.value })}
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">
-                PALAVRAS-CHAVE (SEPARE POR VÍRGULA)
-              </label>
+              <label className="block text-sm font-bold text-slate-700 mb-2">PALAVRAS-CHAVE</label>
               <input
                 type="text"
-                placeholder="liminar, saúde, cdc, urgente"
+                placeholder="liminar, saúde, cdc"
                 className="w-full px-5 py-4 rounded-xl border border-slate-200 text-lg"
                 value={dados.tags}
                 onChange={(e) => setDados({ ...dados, tags: e.target.value })}
@@ -271,7 +259,7 @@ const CreateModel = () => {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-[#0e1e3f] text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:bg-slate-800 transition-all active:scale-[0.98] disabled:opacity-50"
+              className="flex-1 bg-[#0e1e3f] text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:bg-slate-800 transition-all disabled:opacity-50"
             >
               {loading ? "SINCRONIZANDO..." : "SALVAR MODELO"}
             </button>

@@ -4,6 +4,7 @@ import Home from '../pages/Home';
 import GenerateDocument from '../pages/GenerateDocument';
 import CreateModel from '../pages/CreateModel'; 
 import DetalhamentoModelo from '../pages/DetalhamentoModelo';
+import EditModel from '../pages/EditModel'; 
 import Layout from '../components/Layout'; 
 
 const isAuthenticated = () => {
@@ -38,6 +39,12 @@ const AppRoutes = () => (
     <Route path="/modelo/:id" element={
       <PrivateRoute>
         <DetalhamentoModelo />
+      </PrivateRoute>
+    } />
+
+    <Route path="/editar-modelo/:id" element={
+      <PrivateRoute>
+        <EditModel />
       </PrivateRoute>
     } />
     

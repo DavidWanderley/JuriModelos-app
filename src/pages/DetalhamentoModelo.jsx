@@ -14,7 +14,9 @@ const DetalhamentoModelo = () => {
         const response = await api.get(`/modelos/${id}`);
         setModelo(response.data);
       } catch (error) {
-        alert("Não foi possível carregar o modelo. Ele pode ter sido removido.");
+        alert(
+          "Não foi possível carregar o modelo. Ele pode ter sido removido.",
+        );
         navigate("/");
       } finally {
         setLoading(false);
@@ -25,7 +27,7 @@ const DetalhamentoModelo = () => {
 
   const handleDelete = async () => {
     const confirmou = window.confirm(
-      "⚠️ ATENÇÃO: Deseja excluir este modelo do acervo da CW Advocacia? Esta ação é irreversível."
+      "⚠️ ATENÇÃO: Deseja excluir este modelo do acervo da CW Advocacia? Esta ação é irreversível.",
     );
 
     if (confirmou) {
@@ -43,7 +45,9 @@ const DetalhamentoModelo = () => {
     return (
       <div className="ml-44 pt-24 p-10 flex flex-col items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
-        <p className="mt-4 text-slate-500 font-bold">Abrindo pasta jurídica...</p>
+        <p className="mt-4 text-slate-500 font-bold">
+          Abrindo pasta jurídica...
+        </p>
       </div>
     );
 
@@ -65,10 +69,13 @@ const DetalhamentoModelo = () => {
             🗑️ Excluir
           </button>
 
-          <button className="bg-white border border-slate-200 text-slate-700 px-6 py-2 rounded-xl font-bold hover:bg-slate-50 transition-all">
+          <button
+            onClick={() => navigate(`/editar-modelo/${id}`)}
+            className="bg-white border border-slate-200 text-slate-700 px-6 py-2 rounded-xl font-bold hover:bg-slate-50 transition-all"
+          >
             Editar Peça
           </button>
-
+          
           <button
             onClick={() => navigate(`/generate/${id}`)}
             className="bg-[#0e1e3f] text-white px-8 py-2 rounded-xl font-bold shadow-lg hover:bg-slate-800 transition-all"
@@ -98,18 +105,32 @@ const DetalhamentoModelo = () => {
             </h2>
             <div className="space-y-4">
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase">Jurisdição</p>
-                <p className="text-slate-700 font-bold">{modelo.jurisdicao || "Não definida"}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">
+                  Jurisdição
+                </p>
+                <p className="text-slate-700 font-bold">
+                  {modelo.jurisdicao || "Não definida"}
+                </p>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase">Base Legal</p>
-                <p className="text-slate-700 font-bold">{modelo.base_legal || "N/A"}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">
+                  Base Legal
+                </p>
+                <p className="text-slate-700 font-bold">
+                  {modelo.base_legal || "N/A"}
+                </p>
               </div>
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Complexidade</p>
-                <span className={`px-3 py-1 rounded-lg text-xs font-black ${
-                  modelo.complexidade === "Alta" ? "bg-rose-100 text-rose-700" : "bg-emerald-100 text-emerald-700"
-                }`}>
+                <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">
+                  Complexidade
+                </p>
+                <span
+                  className={`px-3 py-1 rounded-lg text-xs font-black ${
+                    modelo.complexidade === "Alta"
+                      ? "bg-rose-100 text-rose-700"
+                      : "bg-emerald-100 text-emerald-700"
+                  }`}
+                >
                   {modelo.complexidade}
                 </span>
               </div>
@@ -118,8 +139,12 @@ const DetalhamentoModelo = () => {
 
           {modelo.pdf_url && (
             <div className="bg-[#0e1e3f] p-8 rounded-3xl shadow-xl text-white">
-              <h2 className="text-xs font-black text-amber-400 uppercase tracking-widest mb-4">Referência PDF</h2>
-              <p className="text-sm text-slate-300 mb-6">Arquivo base para consulta.</p>
+              <h2 className="text-xs font-black text-amber-400 uppercase tracking-widest mb-4">
+                Referência PDF
+              </h2>
+              <p className="text-sm text-slate-300 mb-6">
+                Arquivo base para consulta.
+              </p>
               <a
                 href={`http://localhost:5000/uploads/${modelo.pdf_url}`}
                 target="_blank"
@@ -132,10 +157,15 @@ const DetalhamentoModelo = () => {
           )}
 
           <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-            <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Tags</h2>
+            <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">
+              Tags
+            </h2>
             <div className="flex flex-wrap gap-2">
               {modelo.tags?.split(",").map((tag, index) => (
-                <span key={index} className="bg-slate-50 text-slate-500 border border-slate-100 px-3 py-1 rounded-md text-[10px] font-bold uppercase">
+                <span
+                  key={index}
+                  className="bg-slate-50 text-slate-500 border border-slate-100 px-3 py-1 rounded-md text-[10px] font-bold uppercase"
+                >
                   {tag.trim()}
                 </span>
               ))}

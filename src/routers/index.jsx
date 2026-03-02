@@ -6,6 +6,7 @@ import CreateModel from '../pages/CreateModel';
 import DetalhamentoModelo from '../pages/DetalhamentoModelo';
 import EditModel from '../pages/EditModel'; 
 import Layout from '../components/Layout'; 
+import NotFound from '../pages/NotFound';
 
 const isAuthenticated = () => {
   const token = localStorage.getItem('token');
@@ -53,10 +54,10 @@ const AppRoutes = () => (
         <GenerateDocument />
       </PrivateRoute>
     } />
-    
-    <Route path="/generate/:id" element={
+
+    <Route path="*" element={
       <PrivateRoute>
-        <GenerateDocument />
+        <NotFound />
       </PrivateRoute>
     } />
   </Routes>

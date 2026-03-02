@@ -47,6 +47,12 @@ const AppRoutes = () => (
         <EditModel />
       </PrivateRoute>
     } />
+
+    <Route path="/generate/:id" element={
+      <PrivateRoute>
+        <GenerateDocument />
+      </PrivateRoute>
+    } />
     
     <Route path="/generate/:id" element={
       <PrivateRoute>

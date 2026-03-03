@@ -8,7 +8,8 @@ import EditModel from "../pages/EditModel";
 import Layout from "../components/Layout";
 import NotFound from "../pages/NotFound";
 import SignUp from '../pages/SignUp'; 
-// import ForgotPassword from '../pages/ForgotPassword'; 
+import ForgotPassword from '../pages/ForgotPassword'; 
+import ResetPassword from '../pages/ResetPassword';
 
 const isAuthenticated = () => {
   const token = localStorage.getItem("token");
@@ -28,7 +29,9 @@ const AppRoutes = () => (
     <Route path="/login" element={<Login />} />
 
     <Route path="/criar-conta" element={<SignUp />} />
-    {/* <Route path="/esqueci-a-senha" element={<ForgotPassword />} /> */}
+    <Route path="/esqueci-a-senha" element={<ForgotPassword />} />
+
+    <Route path="/reset-password/:token" element={<ResetPassword />} />
 
     <Route
       path="/"

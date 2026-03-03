@@ -156,7 +156,7 @@ const DetalhamentoModelo = () => {
                 Referência PDF
               </h2>
               <a
-                href={`http://localhost:5000/uploads/${modelo.pdf_url}`}
+                href={`https://jurimodelos-api.onrender.com/uploads/${modelo.pdf_url}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full text-center bg-white text-[#0e1e3f] py-3 rounded-xl font-bold hover:bg-amber-400 transition-all"

@@ -23,10 +23,17 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error.code === 'ECONNABORTED') {
+      console.error('Timeout: Servidor demorou muito para responder');
+    } else if (error.code === 'ERR_NETWORK') {
+      console.error('Erro de rede: Verifique CORS no backend');
+    } else if (!error.response) {
+      console.error('Sem resposta do servidor:', error.message);
+    }
+    
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      
       window.location.href = '/login';
     }
     return Promise.reject(error);

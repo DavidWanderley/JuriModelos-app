@@ -135,7 +135,11 @@ const SignUp = () => {
       alert("Advogado cadastrado com sucesso!");
       navigate("/login");
     } catch (error) {
-      alert(error.response?.data?.message || "Erro ao realizar cadastro.");
+      console.error('Erro completo:', error);
+      const mensagem = error.code === 'ERR_NETWORK' 
+        ? 'Erro ao conectar ao servidor. Verifique se o backend está ativo no Render.'
+        : error.response?.data?.message || 'Erro ao realizar cadastro.';
+      alert(mensagem);
     } finally {
       setLoading(false);
     }

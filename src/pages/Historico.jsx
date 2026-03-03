@@ -54,7 +54,7 @@ const Historico = () => {
                     </td>
                     <td className="p-6 text-right">
                       <a
-                        href={`http://localhost:5000${doc.caminho_arquivo}`}
+                        href={`https://jurimodelos-api.onrender.com${doc.caminho_arquivo}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 bg-slate-100 text-slate-700 px-4 py-2 rounded-xl font-bold text-xs hover:bg-[#0e1e3f] hover:text-white transition-all"

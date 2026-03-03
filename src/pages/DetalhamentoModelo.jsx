@@ -96,7 +96,7 @@ const DetalhamentoModelo = () => {
           >
             Gerar Documento
           </button>
-        </div>  
+        </div>
       </div>
 
       <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -150,7 +150,7 @@ const DetalhamentoModelo = () => {
               </div>
             </div>
           </div>
-          {modelo.pdf_url && (
+          {modelo?.pdf_url && modelo.pdf_url !== "null" && (
             <div className="bg-[#0e1e3f] p-8 rounded-3xl shadow-xl text-white">
               <h2 className="text-xs font-black text-amber-400 uppercase tracking-widest mb-4">
                 Referência PDF

@@ -3,10 +3,10 @@ import { Link, useLocation } from 'react-router-dom';
 const Sidebar = () => {
   const location = useLocation(); 
 
-  const menus = [
+const menus = [
     { name: "Início", icon: "🏠", path: "/" },
-    { name: "Criar Novo Modelo", icon: "➕", path: "/novo-Modelo" },
-    { name: "Histórico Digital", icon: "📂", path: "/historico" }, 
+    { name: "Clientes", icon: "👥", path: "/clientes" }, 
+    { name: "Histórico Digital", icon: "📂", path: "/historico" },
   ];
 
   return (

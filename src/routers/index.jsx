@@ -8,9 +8,11 @@ import EditModel from "../pages/EditModel";
 import Historico from "../pages/Historico";
 import Layout from "../components/Layout";
 import NotFound from "../pages/NotFound";
-import SignUp from '../pages/SignUp'; 
-import ForgotPassword from '../pages/ForgotPassword'; 
-import ResetPassword from '../pages/ResetPassword';
+import SignUp from "../pages/SignUp";
+import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword";
+import Clientes from "../pages/Clientes";
+import CreateCliente from "../pages/CreateCliente";
 
 const isAuthenticated = () => {
   const token = localStorage.getItem("token");
@@ -42,6 +44,15 @@ const AppRoutes = () => (
     />
 
     <Route
+      path="/clientes/novo"
+      element={
+        <PrivateRoute>
+          <CreateCliente />
+        </PrivateRoute>
+      }
+    />
+
+    <Route
       path="/historico"
       element={
         <PrivateRoute>
@@ -55,6 +66,15 @@ const AppRoutes = () => (
       element={
         <PrivateRoute>
           <CreateModel />
+        </PrivateRoute>
+      }
+    />
+
+    <Route
+      path="/clientes"
+      element={
+        <PrivateRoute>
+          <Clientes />
         </PrivateRoute>
       }
     />

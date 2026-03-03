@@ -1,40 +1,34 @@
-# JuriModelos ⚖️
+# 🖥️ JuriModelos Web (Frontend)
 
-O **JuriModelos** é uma ferramenta jurídica.
+Interface administrativa e editor inteligente.
 
-## 🚀 Funcionalidades
+## 🚀 Tecnologias e Ecossistema
+* **React.js (Vite):** Biblioteca base para interface reativa e rápida.
+* **Tailwind CSS:** Framework utilitário para estilização moderna e design system da CW Advocacia.
+* **Axios:** Cliente HTTP para comunicação assíncrona com a API.
+* **React Router Dom:** Gerenciamento de navegação SPA e proteção de rotas privadas.
+* **Lucide React:** Conjunto de ícones vetoriais para sinalização de interface.
+* **ViaCEP API:** Integração externa para consulta e preenchimento automatizado de endereços.
+* **Regular Expressions (Regex):** Motor de busca e captura de chaves dinâmicas `{{...}}` e validação de máscaras.
 
-- **CRUD de Modelos:** Criação, edição, listagem e exclusão de modelos jurídicos.
-- **Motor de Substituição (Replace):** Identifica tags como `{{nome_cliente}}` no texto e as substitui por dados reais.
-- **Formulários Dinâmicos:** (Em desenvolvimento) Geração automática de inputs baseada nas variáveis do modelo.
-- **Persistência:** Integração com banco de dados PostgreSQL (via Neon) utilizando Sequelize.
+## ✨ Funcionalidades Implementadas
+* **Gestão de Clientes:** Cadastro detalhado com abas separadas para Listagem e Criação.
+* **Smart Fill (Preenchimento Inteligente):** Algoritmo que traduz dados do banco de dados para campos de qualificação em tempo real.
+* **Integração ViaCEP:** Busca automática de logradouro, bairro, cidade e estado a partir do CEP.
+* **Sistema de Máscaras Nativas:** Formatação dinâmica para CPF, CNPJ, Telefone e CEP sem dependências de terceiros, garantindo compatibilidade com React 18+.
+* **Renderização de PDF Dinâmica:** Visualização condicional de referências em PDF, evitando links quebrados (tratamento de erros 404 e caminhos nulos).
+* **Previsualização HTML:** Suporte para visualização de documentos com formatação rich-text antes da geração final.
 
-## 🛠️ Tecnologias Utilizadas
+## 📁 Organização do Projeto
+* `/src/pages`: Páginas da aplicação (`Clientes.jsx`, `CreateCliente.jsx`, `GenerateDocument.jsx`).
+* `/src/services`: Configuração da instância do Axios e endpoints da API.
+* `/src/components`: Elementos reutilizáveis como `Sidebar` e `PrivateRoute`.
+* `/src/routes`: Centralização de rotas e segurança de acesso.
 
-### Back-end
-- [Node.js](https://nodejs.org/)
-- [Express](https://expressjs.com/)
-- [Sequelize (ORM)](https://sequelize.org/)
-- [PostgreSQL](https://www.postgresql.org/)
+## 🛠️ Instalação e Execução
+1.  Acesse a pasta do projeto: `cd JuriModelos-web`
+2.  Instale as dependências: `npm install`
+3.  Inicie o projeto: `npm run dev`
 
-### Front-end
-- [React](https://reactjs.org/)
-- [Axios](https://axios-http.com/)
-
-## 📋 Estrutura da API (Endpoints)
-
-| Método | Rota | Descrição |
-| :--- | :--- | :--- |
-| `GET` | `/api/modelos` | Lista todos os modelos (ordenados por criação). |
-| `GET` | `/api/modelos/:id` | Busca detalhes de um modelo específico. |
-| `POST` | `/api/modelos` | Cadastra um novo modelo. |
-| `PUT` | `/api/modelos/:id` | Atualiza um modelo existente. |
-| `DELETE` | `/api/modelos/:id` | Remove um modelo do sistema. |
-| `POST` | `/api/modelos/:id/generate` | Gera o texto final substituindo as variáveis `{{ }}`. |
-
-## 🔧 Como Rodar o Projeto
-
-1. **Clone os repositórios:**
-   ```bash
-   git clone [https://github.com/DavidWanderley/JuriModelos-api](https://github.com/DavidWanderley/JuriModelos-api)
-   git clone [https://github.com/DavidWanderley/JuriModelos-app](https://github.com/DavidWanderley/JuriModelos-app)
+## ⚠️ Requisito Obrigatório
+Este projeto **não funciona isoladamente**. Ele depende da **JuriModelos API** ativa para autenticação e persistência de dados.

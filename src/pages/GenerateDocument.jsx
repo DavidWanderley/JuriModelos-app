@@ -10,35 +10,79 @@ const GenerateDocument = () => {
   const [valores, setValores] = useState({});
   const [documentoGerado, setDocumentoGerado] = useState("");
   const [loading, setLoading] = useState(true);
+  const [listaClientes, setListaClientes] = useState([]);
 
   useEffect(() => {
-    const fetchModelo = async () => {
+    const fetchData = async () => {
       try {
-        const response = await api.get(`/modelos/${id}`);
-        const data = response.data;
+        const responseModelo = await api.get(`/modelos/${id}`);
+        const data = responseModelo.data;
         setModelo(data);
 
         const regex = /{{(.*?)}}/g;
         const matches = [...data.conteudo.matchAll(regex)].map((m) => m[1]);
-
         const variaveisUnicas = [...new Set(matches)];
         setVariaveis(variaveisUnicas);
 
         const initialValues = {};
         variaveisUnicas.forEach((v) => (initialValues[v] = ""));
         setValores(initialValues);
+
+        const responseClientes = await api.get("/clientes");
+        setListaClientes(responseClientes.data);
       } catch (error) {
-        alert("Erro ao carregar modelo para geração.");
+        console.error(error);
+        alert("Erro ao carregar dados para geração.");
         navigate("/");
       } finally {
         setLoading(false);
       }
     };
-    fetchModelo();
+    fetchData();
   }, [id, navigate]);
 
   const handleInputChange = (variavel, valor) => {
     setValores({ ...valores, [variavel]: valor });
+  };
+
+  const handleAutoPreencher = (clienteId) => {
+    if (!clienteId) return;
+    const cliente = listaClientes.find((c) => c.id === parseInt(clienteId));
+    if (!cliente) return;
+
+  const mapaDeDados = {
+    "nome_cliente": cliente.nome_completo,
+    "nome": cliente.nome_completo,
+    "nacionalidade": cliente.nacionalidade || "brasileiro(a)",
+    "estado_civil": cliente.estado_civil,
+    "profissao": cliente.profissao,
+    "rg": cliente.rg,
+    "cpf": cliente.cpf_cnpj, 
+    "cpf_cnpj": cliente.cpf_cnpj,
+    "email": cliente.email,
+    "telefone": cliente.telefone,
+    
+    "cidade": cliente.cidade,      
+    "estado": cliente.estado,      
+    "uf": cliente.estado,          
+    "cep": cliente.cep,
+    "bairro": cliente.bairro,
+    "logradouro": cliente.logradouro,
+    "numero": cliente.numero,
+    "endereco_completo": cliente.endereco_completo,
+    "endereco": cliente.endereco_completo
+  };
+
+    const novosValores = { ...valores };
+
+    variaveis.forEach((v) => {
+      if (mapaDeDados[v.toLowerCase()]) {
+        novosValores[v] = mapaDeDados[v.toLowerCase()];
+      }
+    });
+
+    setValores(novosValores);
+    alert(`Dados de ${cliente.nome_completo} aplicados!`);
   };
 
   const processarDocumento = (e) => {
@@ -116,6 +160,29 @@ const GenerateDocument = () => {
           </header>
 
           <form onSubmit={processarDocumento} className="space-y-6">
+
+            <div className="mb-6 p-5 bg-amber-50 rounded-3xl border border-amber-200">
+              <label className="text-[10px] font-black uppercase text-amber-700 tracking-widest block mb-2">
+                👤 BUSCAR CLIENTE CADASTRADO
+              </label>
+              <select
+                onChange={(e) => handleAutoPreencher(e.target.value)}
+                className="w-full p-3 bg-white border border-amber-300 rounded-xl outline-none font-bold text-slate-700 focus:ring-2 focus:ring-amber-500"
+              >
+                <option value="">
+                  Selecione para preencher automaticamente...
+                </option>
+                {listaClientes.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nome_completo} ({c.cpf_cnpj})
+                  </option>
+                ))}
+              </select>
+              <p className="text-[10px] text-amber-600 mt-2 italic">
+                * Isso preencherá os campos correspondentes automaticamente.
+              </p>
+            </div>
+
             {variaveis.length > 0 ? (
               variaveis.map((v) => (
                 <div key={v} className="flex flex-col gap-2">

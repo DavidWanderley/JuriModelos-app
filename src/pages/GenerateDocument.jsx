@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
-import { Document, Packer, Paragraph, TextRun, AlignmentType } from "docx";
 import { saveAs } from "file-saver";
+import htmlToDocx from "html-to-docx";
 
 const GenerateDocument = () => {
   const { id } = useParams();
@@ -56,43 +56,42 @@ const GenerateDocument = () => {
     window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
   };
 
-  const exportarParaWord = () => {
+  const exportarParaWord = async () => {
     if (!documentoGerado) return;
 
-    const doc = new Document({
-      sections: [
-        {
-          properties: {
-            page: {
-              margin: {
-                top: 1701,
-                right: 1134,
-                bottom: 1134,
-                left: 1701,
-              },
-            },
-          },
-          children: documentoGerado.split("\n").map((linha) => {
-            return new Paragraph({
-              alignment: AlignmentType.JUSTIFIED,
-              spacing: { line: 360 },
-              children: [
-                new TextRun({
-                  text: linha,
-                  font: "Arial",
-                  size: 24,
-                }),
-              ],
-            });
-          }),
-        },
-      ],
-    });
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head><meta charset="utf-8" /></head>
+      <body style="font-family: Arial; font-size: 12pt;">
+        ${documentoGerado}
+      </body>
+    </html>
+  `;
 
-    Packer.toBlob(doc).then((blob) => {
+    const opt = {
+      margin: {
+        top: 1701, 
+        right: 1134, 
+        bottom: 1134, 
+        left: 1701, 
+      },
+      pageNumber: true,
+    };
+
+    try {
+      const bufferData = await htmlToDocx(htmlContent, null, opt);
+
+      const blob = new Blob([bufferData], {
+        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      });
+
       const nomeArquivo = `Peticao_${modelo.titulo.replace(/\s+/g, "_")}.docx`;
       saveAs(blob, nomeArquivo);
-    });
+    } catch (error) {
+      console.error("Erro ao gerar Word:", error);
+      alert("Houve um erro técnico ao converter o documento.");
+    }
   };
 
   if (loading)
@@ -166,8 +165,10 @@ const GenerateDocument = () => {
               {documentoGerado && (
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(documentoGerado);
-                    alert("Copiado para a área de transferência!");
+                    const tempDiv = document.createElement("div");
+                    tempDiv.innerHTML = documentoGerado;
+                    navigator.clipboard.writeText(tempDiv.innerText);
+                    alert("Texto puro copiado para a área de transferência!");
                   }}
                   className="text-amber-600 font-bold text-xs hover:underline"
                 >
@@ -176,8 +177,13 @@ const GenerateDocument = () => {
               )}
             </div>
 
-            <div className="whitespace-pre-wrap font-serif text-lg leading-relaxed text-slate-700 flex-1">
-              {documentoGerado || (
+            <div className="font-serif text-lg leading-relaxed text-slate-700 flex-1">
+              {documentoGerado ? (
+                <div
+                  className="prose max-w-none"
+                  dangerouslySetInnerHTML={{ __html: documentoGerado }}
+                />
+              ) : (
                 <div className="h-full flex flex-col items-center justify-center text-center opacity-30">
                   <span className="text-6xl mb-4">✍️</span>
                   <p className="font-sans font-bold">
@@ -211,7 +217,9 @@ const GenerateDocument = () => {
                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                   />
                 </svg>
-                {documentoGerado ? "BAIXAR EM WORD (.DOCX)" : "GERE O DOCUMENTO PRIMEIRO"}
+                {documentoGerado
+                  ? "BAIXAR EM WORD (.DOCX)"
+                  : "GERE O DOCUMENTO PRIMEIRO"}
               </button>
             </div>
           </div>

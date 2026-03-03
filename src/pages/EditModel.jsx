@@ -1,6 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import LegalEditor from "../components/LegalEditor";
+
+const modules = {
+  toolbar: [
+    [{ header: [1, 2, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    [{ indent: "-1" }, { indent: "+1" }],
+    ["clean"],
+  ],
+};
+
+const formats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "list",
+  "bullet",
+  "indent",
+];
 
 const EditModel = () => {
   const { id } = useParams();
@@ -214,12 +235,11 @@ const EditModel = () => {
                 Dica: Use {"{{variavel}}"} para automação
               </span>
             </div>
-            <textarea
-              name="conteudo"
+            <LegalEditor
               value={formData.conteudo}
-              onChange={handleChange}
-              rows="15"
-              className="bg-slate-50 border border-slate-200 p-8 rounded-[2.5rem] font-serif text-lg leading-relaxed focus:ring-2 focus:ring-amber-500 outline-none transition-all shadow-inner"
+              onChange={(content) =>
+                setFormData({ ...formData, conteudo: content })
+              }
             />
           </div>
 

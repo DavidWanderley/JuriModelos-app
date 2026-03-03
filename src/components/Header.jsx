@@ -4,13 +4,10 @@ import { useNavigate } from "react-router-dom";
 const Header = () => {
   const navigate = useNavigate();
 
-  // 🛡️ Pegamos os dados direto do localStorage (evita o delay do useEffect)
-  // Usamos os nomes das chaves que configuramos no seu Login.jsx
   const nome = localStorage.getItem("nome") || "Usuário";
   const perfil = localStorage.getItem("perfil") || "user";
 
   const getInitials = (fullName) => {
-    // Se o nome não existir ou não for string, retorna "AD" de Advogado
     if (!fullName || typeof fullName !== 'string') return "AD";
 
     const names = fullName.trim().split(/\s+/);
@@ -21,7 +18,6 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    // 🧹 Limpa absolutamente TUDO para não sobrar lixo de sessões antigas
     localStorage.clear(); 
     navigate("/login");
   };
@@ -59,7 +55,6 @@ const Header = () => {
             </p>
           </div>
 
-          {/* 🛡️ Círculo de Perfil Único e Dinâmico */}
           <div className="relative group">
             <div className="w-10 h-10 bg-[#0e1e3f] border-2 border-amber-500 rounded-full flex items-center justify-center text-white font-bold cursor-pointer group-hover:scale-105 transition-transform text-xs">
               {getInitials(nome)}

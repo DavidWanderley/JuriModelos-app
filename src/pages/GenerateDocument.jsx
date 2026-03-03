@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { Document, Packer, Paragraph, TextRun, AlignmentType } from "docx";
+import { saveAs } from "file-saver";
 
 const GenerateDocument = () => {
   const { id } = useParams();
@@ -52,6 +54,45 @@ const GenerateDocument = () => {
 
     setDocumentoGerado(textoFinal);
     window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  };
+
+  const exportarParaWord = () => {
+    if (!documentoGerado) return;
+
+    const doc = new Document({
+      sections: [
+        {
+          properties: {
+            page: {
+              margin: {
+                top: 1701,
+                right: 1134,
+                bottom: 1134,
+                left: 1701,
+              },
+            },
+          },
+          children: documentoGerado.split("\n").map((linha) => {
+            return new Paragraph({
+              alignment: AlignmentType.JUSTIFIED,
+              spacing: { line: 360 },
+              children: [
+                new TextRun({
+                  text: linha,
+                  font: "Arial",
+                  size: 24,
+                }),
+              ],
+            });
+          }),
+        },
+      ],
+    });
+
+    Packer.toBlob(doc).then((blob) => {
+      const nomeArquivo = `Peticao_${modelo.titulo.replace(/\s+/g, "_")}.docx`;
+      saveAs(blob, nomeArquivo);
+    });
   };
 
   if (loading)
@@ -145,6 +186,33 @@ const GenerateDocument = () => {
                   </p>
                 </div>
               )}
+            </div>
+
+            <div className="mt-8 flex gap-4 justify-center">
+              <button
+                onClick={exportarParaWord}
+                disabled={!documentoGerado}
+                className={`flex items-center gap-2 px-8 py-4 rounded-2xl font-black transition-all shadow-lg ${
+                  !documentoGerado
+                    ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                    : "bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95"
+                }`}
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                  />
+                </svg>
+                {documentoGerado ? "BAIXAR EM WORD (.DOCX)" : "GERE O DOCUMENTO PRIMEIRO"}
+              </button>
             </div>
           </div>
         </div>

@@ -11,6 +11,10 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // 🛡️ Capturando dados do usuário logado
+  const perfil = localStorage.getItem("perfil") || "Usuário";
+  const nomeUsuario = localStorage.getItem("nome") || "Colega";
+
   useEffect(() => {
     const fetchModelos = async () => {
       try {
@@ -40,7 +44,9 @@ const Home = () => {
     <div className="ml-15 pt-10 p-10 bg-slate-50 min-h-screen">
       <div className="flex justify-between items-center mb-10">
         <div>
-          <h1 className="text-3xl font-black text-slate-800 tracking-tight">Painel JuriModelos</h1>
+          <h1 className="text-3xl font-black text-slate-800 tracking-tight">
+            Olá, {nomeUsuario.split(" ")[0]}! 👋
+          </h1>
           <p className="text-slate-500 text-lg font-medium">CW Advocacia - Gestão de Acervo</p>
         </div>
         <button
@@ -56,20 +62,27 @@ const Home = () => {
           <p className="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2">Modelos no Banco</p>
           <h2 className="text-4xl font-black text-[#0e1e3f]">{modelos.length}</h2>
         </div>
+        
         <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
           <p className="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2">Filtro Atual</p>
           <h2 className="text-4xl font-black text-[#0e1e3f]">{modelosFiltrados.length}</h2>
         </div>
+
+        {/* 🛡️ Card de Status Dinâmico */}
         <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
           <p className="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2">Status do Acesso</p>
           <div className="flex items-center gap-2 mt-2">
-            <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-            <h2 className="text-xl font-bold text-slate-700">ADMIN</h2>
+            <span className={`w-3 h-3 rounded-full animate-pulse ${perfil === 'admin' ? 'bg-amber-500' : 'bg-green-500'}`}></span>
+            <h2 className="text-xl font-black text-slate-700 uppercase">
+              {perfil === 'admin' ? '🛡️ Administrador' : '⚖️ Advogado'}
+            </h2>
           </div>
         </div>
       </div>
 
+      {/* ... Restante do código de filtros e listagem ... */}
       <div className="space-y-6 mb-10 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+        {/* ... (Mesmo código de categorias e complexidade) ... */}
         <div>
           <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-3">Especialidade</span>
           <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">

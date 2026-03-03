@@ -8,6 +8,8 @@ const DetalhamentoModelo = () => {
   const [modelo, setModelo] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const perfil = localStorage.getItem("perfil");
+
   useEffect(() => {
     const fetchModelo = async () => {
       try {
@@ -36,7 +38,7 @@ const DetalhamentoModelo = () => {
         alert("Modelo removido com sucesso!");
         navigate("/");
       } catch (error) {
-        alert("Erro ao excluir o modelo. Verifique sua conexão.");
+        alert(error.response?.data?.message || "Erro ao excluir o modelo.");
       }
     }
   };
@@ -62,27 +64,39 @@ const DetalhamentoModelo = () => {
         </button>
 
         <div className="flex gap-4">
-          <button
-            onClick={handleDelete}
-            className="bg-white border border-rose-200 text-rose-600 px-6 py-2 rounded-xl font-bold hover:bg-rose-50 transition-all"
-          >
-            🗑️ Excluir
-          </button>
+          {perfil === "admin" ? (
+            <button
+              onClick={handleDelete}
+              className="bg-white border border-rose-200 text-rose-600 px-6 py-2 rounded-xl font-bold hover:bg-rose-50 transition-all"
+            >
+              🗑️ Excluir
+            </button>
+          ) : (
+            <div className="flex items-center text-slate-400 text-[10px] font-black uppercase px-4 border border-slate-200 rounded-xl bg-slate-100/50 cursor-not-allowed tracking-widest">
+              🔒 Exclusão restrita
+            </div>
+          )}
 
-          <button
-            onClick={() => navigate(`/editar-modelo/${id}`)}
-            className="bg-white border border-slate-200 text-slate-700 px-6 py-2 rounded-xl font-bold hover:bg-slate-50 transition-all"
-          >
-            Editar Peça
-          </button>
-          
+          {perfil === "admin" ? (
+            <button
+              onClick={() => navigate(`/editar-modelo/${id}`)}
+              className="bg-white border border-slate-200 text-slate-700 px-6 py-2 rounded-xl font-bold hover:bg-slate-50 transition-all"
+            >
+              Editar Peça
+            </button>
+          ) : (
+            <div className="flex items-center text-slate-400 text-[10px] font-black uppercase px-4 border border-slate-200 rounded-xl bg-slate-100/50 cursor-not-allowed tracking-widest">
+              🔒 Edição restrita
+            </div>
+          )}
+
           <button
             onClick={() => navigate(`/generate/${id}`)}
             className="bg-[#0e1e3f] text-white px-8 py-2 rounded-xl font-bold shadow-lg hover:bg-slate-800 transition-all"
           >
             Gerar Documento
           </button>
-        </div>
+        </div>  
       </div>
 
       <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -136,15 +150,11 @@ const DetalhamentoModelo = () => {
               </div>
             </div>
           </div>
-
           {modelo.pdf_url && (
             <div className="bg-[#0e1e3f] p-8 rounded-3xl shadow-xl text-white">
               <h2 className="text-xs font-black text-amber-400 uppercase tracking-widest mb-4">
                 Referência PDF
               </h2>
-              <p className="text-sm text-slate-300 mb-6">
-                Arquivo base para consulta.
-              </p>
               <a
                 href={`http://localhost:5000/uploads/${modelo.pdf_url}`}
                 target="_blank"
@@ -155,22 +165,6 @@ const DetalhamentoModelo = () => {
               </a>
             </div>
           )}
-
-          <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-            <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">
-              Tags
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {modelo.tags?.split(",").map((tag, index) => (
-                <span
-                  key={index}
-                  className="bg-slate-50 text-slate-500 border border-slate-100 px-3 py-1 rounded-md text-[10px] font-bold uppercase"
-                >
-                  {tag.trim()}
-                </span>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>

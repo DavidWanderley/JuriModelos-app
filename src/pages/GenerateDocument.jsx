@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
-import { saveAs } from "file-saver";
-import htmlToDocx from "html-to-docx";
 
 const GenerateDocument = () => {
   const { id } = useParams();
@@ -59,38 +57,31 @@ const GenerateDocument = () => {
   const exportarParaWord = async () => {
     if (!documentoGerado) return;
 
-    const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-      <head><meta charset="utf-8" /></head>
-      <body style="font-family: Arial; font-size: 12pt;">
-        ${documentoGerado}
-      </body>
-    </html>
-  `;
-
-    const opt = {
-      margin: {
-        top: 1701, 
-        right: 1134, 
-        bottom: 1134, 
-        left: 1701, 
-      },
-      pageNumber: true,
-    };
-
     try {
-      const bufferData = await htmlToDocx(htmlContent, null, opt);
+      const nomeIdentificado = valores.nome_cliente || valores.nome || "";
 
-      const blob = new Blob([bufferData], {
-        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      const response = await api.post("/documentos/salvar", {
+        nome_cliente: nomeIdentificado,
+        conteudo_final: documentoGerado,
+        modelo_titulo: modelo.titulo,
       });
 
-      const nomeArquivo = `Peticao_${modelo.titulo.replace(/\s+/g, "_")}.docx`;
-      saveAs(blob, nomeArquivo);
+      const { downloadUrl } = response.data;
+
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.setAttribute(
+        "download",
+        `Peticao_${nomeIdentificado || "Gerada"}.docx`,
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      alert("Documento gerado e arquivado no histórico da CW Advocacia!");
     } catch (error) {
-      console.error("Erro ao gerar Word:", error);
-      alert("Houve um erro técnico ao converter o documento.");
+      console.error(error);
+      alert("Erro ao processar no servidor. O arquivo não pôde ser gerado.");
     }
   };
 

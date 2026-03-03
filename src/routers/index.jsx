@@ -5,6 +5,7 @@ import GenerateDocument from "../pages/GenerateDocument";
 import CreateModel from "../pages/CreateModel";
 import DetalhamentoModelo from "../pages/DetalhamentoModelo";
 import EditModel from "../pages/EditModel";
+import Historico from "../pages/Historico";
 import Layout from "../components/Layout";
 import NotFound from "../pages/NotFound";
 import SignUp from '../pages/SignUp'; 
@@ -27,10 +28,8 @@ const PrivateRoute = ({ children }) => {
 const AppRoutes = () => (
   <Routes>
     <Route path="/login" element={<Login />} />
-
     <Route path="/criar-conta" element={<SignUp />} />
     <Route path="/esqueci-a-senha" element={<ForgotPassword />} />
-
     <Route path="/reset-password/:token" element={<ResetPassword />} />
 
     <Route
@@ -38,6 +37,15 @@ const AppRoutes = () => (
       element={
         <PrivateRoute>
           <Home />
+        </PrivateRoute>
+      }
+    />
+
+    <Route
+      path="/historico"
+      element={
+        <PrivateRoute>
+          <Historico />
         </PrivateRoute>
       }
     />

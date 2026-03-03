@@ -6,7 +6,7 @@ const Sidebar = () => {
   const menus = [
     { name: "Início", icon: "🏠", path: "/" },
     { name: "Criar Novo Modelo", icon: "➕", path: "/novo-Modelo" },
-
+    { name: "Histórico Digital", icon: "📂", path: "/historico" }, 
   ];
 
   return (

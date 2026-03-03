@@ -6,6 +6,7 @@ const SignUp = () => {
   const [dados, setDados] = useState({
     nome: "",
     email: "",
+    confirmarEmail: "",
     senha: "",
     confirmarSenha: "",
     telefone: "",
@@ -121,12 +122,15 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (dados.email !== dados.confirmarEmail)
+      return alert("Os e-mails não coincidem!");
     if (dados.senha !== dados.confirmarSenha)
       return alert("As senhas não coincidem!");
 
     setLoading(true);
     try {
-      const { confirmarSenha, ...dadosParaEnviar } = dados;
+      const { confirmarEmail, confirmarSenha, ...dadosParaEnviar } = dados;
+
       await api.post("/auth/register", dadosParaEnviar);
       alert("Advogado cadastrado com sucesso!");
       navigate("/login");
@@ -195,7 +199,7 @@ const SignUp = () => {
                 />
               </div>
 
-              <div className="md:col-span-2 flex flex-col gap-1">
+              <div className="md:col-span-1 flex flex-col gap-1">
                 <label className="text-[10px] font-black uppercase text-slate-400 ml-2">
                   E-mail *
                 </label>
@@ -203,8 +207,22 @@ const SignUp = () => {
                   type="email"
                   name="email"
                   required
-                  className="bg-slate-50 border p-4 rounded-2xl outline-none font-bold text-slate-700 focus:ring-2 focus:ring-amber-500"
+                  className="bg-slate-50 border p-4 rounded-2xl outline-none font-bold text-slate-700"
                   value={dados.email}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="md:col-span-1 flex flex-col gap-1">
+                <label className="text-[10px] font-black uppercase text-slate-400 ml-2">
+                  Confirmar E-mail *
+                </label>
+                <input
+                  type="email"
+                  name="confirmarEmail"
+                  required
+                  className="bg-slate-50 border p-4 rounded-2xl outline-none font-bold text-slate-700"
+                  value={dados.confirmarEmail}
                   onChange={handleChange}
                 />
               </div>
@@ -235,7 +253,7 @@ const SignUp = () => {
                   onChange={handleChange}
                 />
               </div>
-              <div className="flex flex-col gap-1">
+              <div className="md:col-span-2 lg:col-span-1 flex flex-col gap-1">
                 <label className="text-[10px] font-black uppercase text-slate-400 ml-2">
                   Telefone *
                 </label>

@@ -2,10 +2,13 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "../pages/publicas/Login";
 import Home from "../pages/home/Home";
 import GenerateDocument from "../pages/generate/GenerateDocument";
+import GerarDocumento from "../pages/generate/GerarDocumento";
 import CreateModel from "../pages/modelos/CreateModel";
+import Modelos from "../pages/modelos/Modelos";
 import DetalhamentoModelo from "../pages/modelos/DetalhamentoModelo";
 import EditModel from "../pages/modelos/EditModel";
 import Historico from "../pages/historico/Historico";
+import Agenda from "../pages/agenda/Agenda";
 import Layout from "../components/Layout";
 import NotFound from "../pages/publicas/NotFound";
 import SignUp from "../pages/publicas/SignUp";
@@ -44,6 +47,15 @@ const AppRoutes = () => (
     />
 
     <Route
+      path="/gerar-documento"
+      element={
+        <PrivateRoute>
+          <GerarDocumento />
+        </PrivateRoute>
+      }
+    />
+
+    <Route
       path="/clientes/novo"
       element={
         <PrivateRoute>
@@ -62,7 +74,25 @@ const AppRoutes = () => (
     />
 
     <Route
-      path="/novo-Modelo"
+      path="/modelos"
+      element={
+        <PrivateRoute>
+          <Modelos />
+        </PrivateRoute>
+      }
+    />
+
+    <Route
+      path="/agenda"
+      element={
+        <PrivateRoute>
+          <Agenda />
+        </PrivateRoute>
+      }
+    />
+
+    <Route
+      path="/novo-modelo"
       element={
         <PrivateRoute>
           <CreateModel />

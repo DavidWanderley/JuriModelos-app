@@ -111,9 +111,11 @@ const GenerateDocument = () => {
       });
 
       const { downloadUrl } = response.data;
+      const baseURL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+      const fullDownloadUrl = downloadUrl.startsWith('http') ? downloadUrl : `${baseURL}${downloadUrl}`;
 
       const link = document.createElement("a");
-      link.href = downloadUrl;
+      link.href = fullDownloadUrl;
       link.setAttribute(
         "download",
         `Peticao_${nomeIdentificado || "Gerada"}.docx`,

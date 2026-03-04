@@ -1,18 +1,18 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "../pages/publicas/Login";
-import Home from "../pages/Home";
-import GenerateDocument from "../pages/GenerateDocument";
+import Home from "../pages/home/Home";
+import GenerateDocument from "../pages/generate/GenerateDocument";
 import CreateModel from "../pages/modelos/CreateModel";
-import DetalhamentoModelo from "../pages/DetalhamentoModelo";
-import EditModel from "../pages/EditModel";
+import DetalhamentoModelo from "../pages/modelos/DetalhamentoModelo";
+import EditModel from "../pages/modelos/EditModel";
 import Historico from "../pages/historico/Historico";
 import Layout from "../components/Layout";
-import NotFound from "../pages/NotFound";
+import NotFound from "../pages/publicas/NotFound";
 import SignUp from "../pages/publicas/SignUp";
-import ForgotPassword from "../pages/ForgotPassword";
+import ForgotPassword from "../pages/publicas/ForgotPassword";
 import ResetPassword from "../pages/publicas/ResetPassword";
-import Clientes from "../pages/Clientes";
-import CreateCliente from "../pages/CreateCliente";
+import Clientes from "../pages/clientes/Clientes";
+import CreateCliente from "../pages/clientes/CreateCliente";
 
 const isAuthenticated = () => {
   const token = localStorage.getItem("token");

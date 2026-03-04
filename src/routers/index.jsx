@@ -1,16 +1,16 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Login from "../pages/Login";
+import Login from "../pages/publicas/Login";
 import Home from "../pages/Home";
 import GenerateDocument from "../pages/GenerateDocument";
-import CreateModel from "../pages/CreateModel";
+import CreateModel from "../pages/modelos/CreateModel";
 import DetalhamentoModelo from "../pages/DetalhamentoModelo";
 import EditModel from "../pages/EditModel";
-import Historico from "../pages/Historico";
+import Historico from "../pages/historico/Historico";
 import Layout from "../components/Layout";
 import NotFound from "../pages/NotFound";
-import SignUp from "../pages/SignUp";
+import SignUp from "../pages/publicas/SignUp";
 import ForgotPassword from "../pages/ForgotPassword";
-import ResetPassword from "../pages/ResetPassword";
+import ResetPassword from "../pages/publicas/ResetPassword";
 import Clientes from "../pages/Clientes";
 import CreateCliente from "../pages/CreateCliente";
 

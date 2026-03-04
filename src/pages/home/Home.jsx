@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../services/api";
-import ModelCard from "../components/ModelCard";
+import api from "../../services/api";
+import ModelCard from "../../components/ModelCard";
 
 const Home = () => {
   const [modelos, setModelos] = useState([]);

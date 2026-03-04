@@ -34,7 +34,8 @@ const ResetPassword = () => {
       setSucesso(true);
       setTimeout(() => navigate("/login"), 3000); 
     } catch (error) {
-      alert(error.response?.data?.message || "Erro ao redefinir senha. O link pode ter expirado.");
+      console.error('Erro reset-password:', error.response?.data);
+      alert(error.response?.data?.message || error.response?.data?.error || "Erro ao redefinir senha. O link pode ter expirado.");
     } finally {
       setLoading(false);
     }

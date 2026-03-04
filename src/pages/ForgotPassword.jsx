@@ -16,8 +16,10 @@ const ForgotPassword = () => {
       await api.post("/auth/forgot-password", { email });
       setEnviado(true);
     } catch (error) {
+      console.error('Erro forgot-password:', error.response?.data);
       alert(
         error.response?.data?.message || 
+        error.response?.data?.error ||
         "Erro ao processar solicitação. Verifique se o e-mail está correto."
       );
     } finally {

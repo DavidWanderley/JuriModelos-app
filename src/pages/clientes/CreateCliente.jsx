@@ -1,6 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import { mascaraCPFouCNPJ, mascaraTelefone, mascaraCEP } from "../../utils/masks";
+import { validarCPFouCNPJ, validarEmail, validarCEP } from "../../utils/validators";
+import { toast } from "../../components/Toast";
+import { MESSAGES, STYLES } from "../../utils/constants";
+import { LABELS } from "../../utils/labels";
 
 const CreateCliente = () => {
   const navigate = useNavigate();
@@ -10,18 +15,69 @@ const CreateCliente = () => {
     email: "", telefone: "", cep: "", logradouro: "", 
     numero: "", complemento: "", bairro: "", cidade: "", estado: ""
   });
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [buscandoCep, setBuscandoCep] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
-  const mascaraCPF = (v) => v.replace(/\D/g, "").replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4").substring(0, 14);
-  const mascaraTelefone = (v) => v.replace(/\D/g, "").replace(/^(\d{2})(\d{5})(\d{4}).*/, "($1) $2-$3").substring(0, 15);
-  const mascaraCEP = (v) => v.replace(/\D/g, "").replace(/^(\d{5})(\d{3}).*/, "$1-$2").substring(0, 9);
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (hasChanges) {
+        e.preventDefault();
+        e.returnValue = MESSAGES.CONFIRM.SAIR_SEM_SALVAR;
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasChanges]);
+
+  const handleChange = (field, value) => {
+    setForm({ ...form, [field]: value });
+    setHasChanges(true);
+    if (errors[field]) {
+      setErrors({ ...errors, [field]: "" });
+    }
+  };
+
+  const validateField = (field, value) => {
+    switch (field) {
+      case "cpf_cnpj":
+        if (value && !validarCPFouCNPJ(value)) {
+          const numeros = value.replace(/\D/g, "");
+          return numeros.length === 11 ? MESSAGES.ERROR.CPF_INVALIDO : MESSAGES.ERROR.CNPJ_INVALIDO;
+        }
+        break;
+      case "email":
+        if (value && !validarEmail(value)) {
+          return MESSAGES.ERROR.EMAIL_INVALIDO;
+        }
+        break;
+      case "cep":
+        if (value && !validarCEP(value)) {
+          return "CEP deve ter 8 dígitos";
+        }
+        break;
+    }
+    return "";
+  };
+
+  const handleBlur = (field) => {
+    const error = validateField(field, form[field]);
+    if (error) {
+      setErrors({ ...errors, [field]: error });
+    }
+  };
 
   const handleCepBlur = async (e) => {
     const cep = e.target.value.replace(/\D/g, "");
     if (cep.length !== 8) return;
+    
+    setBuscandoCep(true);
     try {
-      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-      const data = await response.json();
-      if (!data.erro) {
+      const response = await api.get(`/buscar-cep/${cep}`);
+      const data = response.data;
+      
+      if (data.logradouro) {
         setForm(prev => ({ 
           ...prev, 
           logradouro: data.logradouro || "", 
@@ -29,29 +85,55 @@ const CreateCliente = () => {
           cidade: data.localidade || "", 
           estado: data.uf || "" 
         }));
+        toast.success("Endereço encontrado!");
+      } else {
+        toast.error(MESSAGES.ERROR.CEP_INVALIDO);
       }
-    } catch (err) { console.error("Erro CEP:", err); }
+    } catch (err) {
+      toast.error(MESSAGES.ERROR.CEP_BUSCAR);
+    } finally {
+      setBuscandoCep(false);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const newErrors = {};
+    if (form.cpf_cnpj) {
+      const cpfError = validateField("cpf_cnpj", form.cpf_cnpj);
+      if (cpfError) newErrors.cpf_cnpj = cpfError;
+    }
+    if (form.email) {
+      const emailError = validateField("email", form.email);
+      if (emailError) newErrors.email = emailError;
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error(MESSAGES.ERROR.CAMPOS_OBRIGATORIOS);
+      return;
+    }
+
     const enderecoFormatado = `${form.logradouro}, nº ${form.numero}${form.complemento ? `, ${form.complemento}` : ""}, ${form.bairro}, ${form.cidade}/${form.estado}, CEP: ${form.cep}`;
     
+    setLoading(true);
     try {
       await api.post("/clientes", { 
         ...form, 
         endereco_completo: enderecoFormatado 
       });
-      alert("Cliente cadastrado com sucesso!");
-      navigate("/clientes");
-    } catch (err) { 
-      alert("Erro ao salvar cliente."); 
+      toast.success(MESSAGES.SUCCESS.CLIENTE_CADASTRADO);
+      setHasChanges(false);
+      setTimeout(() => navigate("/clientes"), 1000);
+    } catch (err) {
+      toast.error(err.response?.data?.message || MESSAGES.ERROR.CLIENTE_SALVAR);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const inputStyle = "p-4 bg-slate-50 rounded-2xl border border-slate-200 outline-none focus:ring-2 focus:ring-amber-500 font-bold text-slate-700 transition-all text-left";
-  const labelStyle = "text-[11px] font-bold text-slate-700 ml-1 uppercase tracking-wider";
-  const helperStyle = "text-[10px] text-slate-400 ml-1 italic font-medium";
+  const getInputStyle = (field) => errors[field] ? STYLES.INPUT_ERROR : STYLES.INPUT;
 
   return (
     <div className=" bg-slate-50 min-h-screen">
@@ -69,101 +151,199 @@ const CreateCliente = () => {
         <form onSubmit={handleSubmit} className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-bottom-4 duration-500">
           
           <div className="md:col-span-3 border-b border-slate-100 pb-2 text-left">
-            <h2 className="text-amber-600 font-black text-xs uppercase tracking-widest">1. Informações Pessoais</h2>
+            <h2 className="text-amber-600 font-black text-xs uppercase tracking-widest">{LABELS.SECAO_INFO_PESSOAIS}</h2>
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className={labelStyle}>Nome Completo <span className="text-red-500">*</span></label>
-            <input className={inputStyle} placeholder="Ex: João da Silva" value={form.nome_completo} onChange={e => setForm({...form, nome_completo: e.target.value})} required />
-            <p className={helperStyle}>Nome para o cabeçalho da petição.</p>
+            <label className={STYLES.LABEL}>{LABELS.NOME_COMPLETO} <span className="text-red-500">{LABELS.OBRIGATORIO}</span></label>
+            <input 
+              className={getInputStyle("nome_completo")} 
+              placeholder={LABELS.PLACEHOLDER_NOME} 
+              value={form.nome_completo} 
+              onChange={e => handleChange("nome_completo", e.target.value)} 
+              required 
+            />
+            <p className={STYLES.HELPER}>{LABELS.HELPER_NOME}</p>
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className={labelStyle}>CPF / CNPJ <span className="text-red-500">*</span></label>
-            <input className={inputStyle} placeholder="000.000.000-00" value={form.cpf_cnpj} onChange={e => setForm({...form, cpf_cnpj: mascaraCPF(e.target.value)})} required />
-            <p className={helperStyle}>Documento principal da parte.</p>
+            <label className={STYLES.LABEL}>{LABELS.CPF_CNPJ} <span className="text-red-500">{LABELS.OBRIGATORIO}</span></label>
+            <input 
+              className={getInputStyle("cpf_cnpj")} 
+              placeholder={LABELS.PLACEHOLDER_CPF} 
+              value={form.cpf_cnpj} 
+              onChange={e => handleChange("cpf_cnpj", mascaraCPFouCNPJ(e.target.value))} 
+              onBlur={() => handleBlur("cpf_cnpj")}
+              required 
+            />
+            {errors.cpf_cnpj ? (
+              <p className={STYLES.ERROR_TEXT}>{errors.cpf_cnpj}</p>
+            ) : (
+              <p className={STYLES.HELPER}>{LABELS.HELPER_CPF}</p>
+            )}
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className={labelStyle}>RG</label>
-            <input className={inputStyle} placeholder="Número do RG" value={form.rg} onChange={e => setForm({...form, rg: e.target.value})} />
-            <p className={helperStyle}>Registro Geral e Órgão Expedidor.</p>
+            <label className={STYLES.LABEL}>{LABELS.RG}</label>
+            <input 
+              className={getInputStyle("rg")} 
+              placeholder={LABELS.PLACEHOLDER_RG} 
+              value={form.rg} 
+              onChange={e => handleChange("rg", e.target.value)} 
+            />
+            <p className={STYLES.HELPER}>{LABELS.HELPER_RG}</p>
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className={labelStyle}>Estado Civil</label>
-            <select className={inputStyle} value={form.estado_civil} onChange={e => setForm({...form, estado_civil: e.target.value})}>
-              <option value="">Selecione...</option>
-              <option value="Solteiro(a)">Solteiro(a)</option>
-              <option value="Casado(a)">Casado(a)</option>
-              <option value="Divorciado(a)">Divorciado(a)</option>
-              <option value="Viúvo(a)">Viúvo(a)</option>
-              <option value="União Estável">União Estável</option>
+            <label className={STYLES.LABEL}>{LABELS.ESTADO_CIVIL}</label>
+            <select 
+              className={getInputStyle("estado_civil")} 
+              value={form.estado_civil} 
+              onChange={e => handleChange("estado_civil", e.target.value)}
+            >
+              <option value="">{LABELS.PLACEHOLDER_SELECIONE}</option>
+              <option value="Solteiro(a)">{LABELS.SOLTEIRO}</option>
+              <option value="Casado(a)">{LABELS.CASADO}</option>
+              <option value="Divorciado(a)">{LABELS.DIVORCIADO}</option>
+              <option value="Viúvo(a)">{LABELS.VIUVO}</option>
+              <option value="União Estável">{LABELS.UNIAO_ESTAVEL}</option>
             </select>
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className={labelStyle}>Profissão</label>
-            <input className={inputStyle} placeholder="Ex: Autônomo" value={form.profissao} onChange={e => setForm({...form, profissao: e.target.value})} />
+            <label className={STYLES.LABEL}>{LABELS.PROFISSAO}</label>
+            <input 
+              className={getInputStyle("profissao")} 
+              placeholder={LABELS.PLACEHOLDER_PROFISSAO} 
+              value={form.profissao} 
+              onChange={e => handleChange("profissao", e.target.value)} 
+            />
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className={labelStyle}>Nacionalidade</label>
-            <input className={inputStyle} value={form.nacionalidade} onChange={e => setForm({...form, nacionalidade: e.target.value})} />
+            <label className={STYLES.LABEL}>{LABELS.NACIONALIDADE}</label>
+            <input 
+              className={getInputStyle("nacionalidade")} 
+              value={form.nacionalidade} 
+              onChange={e => handleChange("nacionalidade", e.target.value)} 
+            />
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className={labelStyle}>Telefone / WhatsApp <span className="text-red-500">*</span></label>
-            <input className={inputStyle} placeholder="(00) 00000-0000" value={form.telefone} onChange={e => setForm({...form, telefone: mascaraTelefone(e.target.value)})} required />
+            <label className={STYLES.LABEL}>{LABELS.TELEFONE} <span className="text-red-500">{LABELS.OBRIGATORIO}</span></label>
+            <input 
+              className={getInputStyle("telefone")} 
+              placeholder={LABELS.PLACEHOLDER_TELEFONE} 
+              value={form.telefone} 
+              onChange={e => handleChange("telefone", mascaraTelefone(e.target.value))} 
+              required 
+            />
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className={labelStyle}>E-mail</label>
-            <input className={inputStyle} type="email" placeholder="cliente@email.com" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
+            <label className={STYLES.LABEL}>{LABELS.EMAIL}</label>
+            <input 
+              className={getInputStyle("email")} 
+              type="email" 
+              placeholder={LABELS.PLACEHOLDER_EMAIL} 
+              value={form.email} 
+              onChange={e => handleChange("email", e.target.value)}
+              onBlur={() => handleBlur("email")}
+            />
+            {errors.email && <p className={STYLES.ERROR_TEXT}>{errors.email}</p>}
           </div>
 
           <div className="md:col-span-3 border-b border-slate-100 pb-2 mt-4 text-left">
-            <h2 className="text-amber-600 font-black text-xs uppercase tracking-widest">2. Endereço Residencial</h2>
+            <h2 className="text-amber-600 font-black text-xs uppercase tracking-widest">{LABELS.SECAO_ENDERECO}</h2>
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className={labelStyle}>CEP <span className="text-red-500">*</span></label>
-            <input className={`${inputStyle} border-amber-200 bg-amber-50/30`} placeholder="00000-000" value={form.cep} onBlur={handleCepBlur} onChange={e => setForm({...form, cep: mascaraCEP(e.target.value)})} required />
-            <p className="text-[10px] text-amber-600 ml-1 italic font-bold">Busca automática ao sair do campo.</p>
+            <label className={STYLES.LABEL}>{LABELS.CEP} <span className="text-red-500">{LABELS.OBRIGATORIO}</span></label>
+            <div className="relative">
+              <input 
+                className={`${getInputStyle("cep")} border-amber-200 bg-amber-50/30`} 
+                placeholder={LABELS.PLACEHOLDER_CEP} 
+                value={form.cep} 
+                onBlur={handleCepBlur} 
+                onChange={e => handleChange("cep", mascaraCEP(e.target.value))} 
+                disabled={buscandoCep}
+                required 
+              />
+              {buscandoCep && (
+                <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-amber-500"></div>
+                </div>
+              )}
+            </div>
+            <p className="text-[10px] text-amber-600 ml-1 italic font-bold">{LABELS.HELPER_CEP}</p>
           </div>
 
           <div className="flex flex-col gap-1 text-left md:col-span-2">
-            <label className={labelStyle}>Logradouro (Rua/Avenida)</label>
-            <input className={inputStyle} value={form.logradouro} onChange={e => setForm({...form, logradouro: e.target.value})} />
+            <label className={STYLES.LABEL}>{LABELS.LOGRADOURO}</label>
+            <input 
+              className={getInputStyle("logradouro")} 
+              value={form.logradouro} 
+              onChange={e => handleChange("logradouro", e.target.value)} 
+            />
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className={labelStyle}>Número <span className="text-red-500">*</span></label>
-            <input className={inputStyle} placeholder="Ex: 123" value={form.numero} onChange={e => setForm({...form, numero: e.target.value})} required />
+            <label className={STYLES.LABEL}>{LABELS.NUMERO} <span className="text-red-500">{LABELS.OBRIGATORIO}</span></label>
+            <input 
+              className={getInputStyle("numero")} 
+              placeholder={LABELS.PLACEHOLDER_NUMERO} 
+              value={form.numero} 
+              onChange={e => handleChange("numero", e.target.value)} 
+              required 
+            />
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className={labelStyle}>Complemento</label>
-            <input className={inputStyle} placeholder="Apto, Casa 2..." value={form.complemento} onChange={e => setForm({...form, complemento: e.target.value})} />
+            <label className={STYLES.LABEL}>{LABELS.COMPLEMENTO}</label>
+            <input 
+              className={getInputStyle("complemento")} 
+              placeholder={LABELS.PLACEHOLDER_COMPLEMENTO} 
+              value={form.complemento} 
+              onChange={e => handleChange("complemento", e.target.value)} 
+            />
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className={labelStyle}>Bairro</label>
-            <input className={inputStyle} value={form.bairro} onChange={e => setForm({...form, bairro: e.target.value})} />
+            <label className={STYLES.LABEL}>{LABELS.BAIRRO}</label>
+            <input 
+              className={getInputStyle("bairro")} 
+              value={form.bairro} 
+              onChange={e => handleChange("bairro", e.target.value)} 
+            />
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className={labelStyle}>Cidade</label>
-            <input className={`${inputStyle} bg-slate-100 cursor-not-allowed`} value={form.cidade} readOnly />
+            <label className={STYLES.LABEL}>{LABELS.CIDADE}</label>
+            <input 
+              className={`${STYLES.INPUT} bg-slate-100 cursor-not-allowed`} 
+              value={form.cidade} 
+              readOnly 
+            />
           </div>
 
           <div className="flex flex-col gap-1 text-left">
-            <label className={labelStyle}>Estado (UF)</label>
-            <input className={`${inputStyle} bg-slate-100 cursor-not-allowed`} value={form.estado} readOnly />
+            <label className={STYLES.LABEL}>{LABELS.ESTADO}</label>
+            <input 
+              className={`${STYLES.INPUT} bg-slate-100 cursor-not-allowed`} 
+              value={form.estado} 
+              readOnly 
+            />
           </div>
 
-          <button type="submit" className="md:col-span-3 bg-[#0e1e3f] text-white p-5 rounded-2xl font-black text-lg hover:bg-slate-800 transition-all shadow-xl active:scale-95 mt-4">
-            SALVAR CLIENTE NA BASE DA CW ADVOCACIA
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="md:col-span-3 bg-[#0e1e3f] text-white p-5 rounded-2xl font-black text-lg hover:bg-slate-800 transition-all shadow-xl active:scale-95 mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+          >
+            {loading && (
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            )}
+            {loading ? "SALVANDO..." : "SALVAR CLIENTE NA BASE DA CW ADVOCACIA"}
           </button>
         </form>
       </div>

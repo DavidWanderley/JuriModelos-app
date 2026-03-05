@@ -1,4 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { storage } from "../services/storage";
+import { ROUTES } from "../utils/routes";
 import Login from "../pages/publicas/Login";
 import Home from "../pages/home/Home";
 import Templates from "../pages/templates/Templates";
@@ -19,16 +21,13 @@ import ResetPassword from "../pages/publicas/ResetPassword";
 import Clientes from "../pages/clientes/Clientes";
 import CreateCliente from "../pages/clientes/CreateCliente";
 
-const isAuthenticated = () => {
-  const token = localStorage.getItem("token");
-  return token !== null && token !== "" && token !== "undefined";
-};
+const isAuthenticated = () => storage.isAuthenticated();
 
 const PrivateRoute = ({ children }) => {
   return isAuthenticated() ? (
     <Layout>{children}</Layout>
   ) : (
-    <Navigate to="/login" replace />
+    <Navigate to={ROUTES.LOGIN} replace />
   );
 };
 

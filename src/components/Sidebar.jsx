@@ -5,7 +5,7 @@ const Sidebar = () => {
 
   const menus = [
     { name: "Início", icon: "🏠", path: "/" },
-    { name: "Gerar Documento", icon: "📝", path: "/gerar-documento" },
+    { name: "Templates", icon: "⚙️", path: "/templates" },
     { name: "Modelos", icon: "📋", path: "/modelos" },
     { name: "Clientes", icon: "👥", path: "/clientes" },
     { name: "Histórico Digital", icon: "📂", path: "/historico" },

@@ -77,25 +77,14 @@ const DetalhamentoModelo = () => {
             </div>
           )}
 
-          {perfil === "admin" ? (
+          {perfil === "admin" && (
             <button
               onClick={() => navigate(`/editar-modelo/${id}`)}
               className="bg-white border border-slate-200 text-slate-700 px-6 py-2 rounded-xl font-bold hover:bg-slate-50 transition-all"
             >
-              Editar Peça
+              Editar Modelo
             </button>
-          ) : (
-            <div className="flex items-center text-slate-400 text-[10px] font-black uppercase px-4 border border-slate-200 rounded-xl bg-slate-100/50 cursor-not-allowed tracking-widest">
-              🔒 Edição restrita
-            </div>
           )}
-
-          <button
-            onClick={() => navigate(`/generate/${id}`)}
-            className="bg-[#0e1e3f] text-white px-8 py-2 rounded-xl font-bold shadow-lg hover:bg-slate-800 transition-all"
-          >
-            Gerar Documento
-          </button>
         </div>
       </div>
 

@@ -21,7 +21,16 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const newToken = response.headers['x-new-token'];
+    
+    if (newToken) {
+      console.log('🔄 Token renovado automaticamente');
+      localStorage.setItem('token', newToken);
+    }
+    
+    return response;
+  },
   (error) => {
     if (error.code === 'ECONNABORTED') {
       console.error('Timeout: Servidor demorou muito para responder');
@@ -34,6 +43,8 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      localStorage.removeItem('nome');
+      localStorage.removeItem('perfil');
       window.location.href = '/login';
     }
     return Promise.reject(error);

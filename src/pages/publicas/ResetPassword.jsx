@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../services/api";
+import { toast } from "../../components/Toast";
+import { LABELS } from "../../utils/labels";
+import { validarSenhaForte } from "../../utils/validators";
+import PasswordStrength from "../../components/PasswordStrength";
 
 const ResetPassword = () => {
   const { token } = useParams(); 
@@ -21,7 +25,13 @@ const ResetPassword = () => {
     e.preventDefault();
 
     if (dados.password !== dados.confirmPassword) {
-      return alert("As senhas não coincidem!");
+      return toast.error("As senhas não coincidem!");
+    }
+
+    // Validar força da senha
+    const validacaoSenha = validarSenhaForte(dados.password);
+    if (!validacaoSenha.valida) {
+      return toast.error(validacaoSenha.mensagem);
     }
 
     setLoading(true);
@@ -35,7 +45,7 @@ const ResetPassword = () => {
       setTimeout(() => navigate("/login"), 3000); 
     } catch (error) {
       console.error('Erro reset-password:', error.response?.data);
-      alert(error.response?.data?.message || error.response?.data?.error || "Erro ao redefinir senha. O link pode ter expirado.");
+      toast.error(error.response?.data?.message || error.response?.data?.error || "Erro ao redefinir senha. O link pode ter expirado.");
     } finally {
       setLoading(false);
     }
@@ -59,24 +69,27 @@ const ResetPassword = () => {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-black uppercase text-slate-400 ml-2">Nova Senha</label>
+                <label className="text-xs font-black uppercase text-slate-400 ml-2">{LABELS.SENHA}</label>
                 <input
                   type="password"
                   name="password"
                   required
+                  minLength="8"
                   placeholder="••••••••"
                   className="bg-slate-50 border border-slate-200 p-4 rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none font-bold text-slate-700"
                   value={dados.password}
                   onChange={handleChange}
                 />
+                <PasswordStrength password={dados.password} />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-xs font-black uppercase text-slate-400 ml-2">Confirmar Nova Senha</label>
+                <label className="text-xs font-black uppercase text-slate-400 ml-2">{LABELS.CONFIRMAR_SENHA}</label>
                 <input
                   type="password"
                   name="confirmPassword"
                   required
+                  minLength="8"
                   placeholder="••••••••"
                   className="bg-slate-50 border border-slate-200 p-4 rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none font-bold text-slate-700"
                   value={dados.confirmPassword}

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import { toast } from "../../components/Toast";
+import { MESSAGES } from "../../utils/constants";
+import { LABELS } from "../../utils/labels";
 
 const CreateModel = () => {
   const [dados, setDados] = useState({
@@ -36,11 +39,11 @@ const CreateModel = () => {
       }
 
       await api.post("/modelos", formData);
-      alert("Modelo e PDF salvos com sucesso!");
-      navigate("/");
+      toast.success(MESSAGES.SUCCESS.MODELO_CRIADO);
+      setTimeout(() => navigate("/modelos"), 1000);
     } catch (error) {
       console.error("Erro ao salvar:", error);
-      alert("Erro ao salvar. Verifique se o Backend aceita arquivos.");
+      toast.error(MESSAGES.ERROR.MODELO_CARREGAR);
     } finally {
       setLoading(false);
     }
@@ -85,7 +88,7 @@ const CreateModel = () => {
               </div>
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">
-                  CATEGORIA <span className="text-rose-500">*</span>
+                  {LABELS.CATEGORIA} <span className="text-rose-500">{LABELS.OBRIGATORIO}</span>
                 </label>
                 <select
                   className="w-full px-5 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 outline-none text-xl bg-white"
@@ -162,7 +165,7 @@ const CreateModel = () => {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">JURISDIÇÃO</label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">{LABELS.JURISDICAO}</label>
                 <select
                   className="w-full px-5 py-4 rounded-xl border border-slate-200 text-lg bg-white"
                   value={dados.jurisdicao}
@@ -175,7 +178,7 @@ const CreateModel = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">COMPLEXIDADE</label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">{LABELS.COMPLEXIDADE}</label>
                 <select
                   className="w-full px-5 py-4 rounded-xl border border-slate-200 text-lg bg-white"
                   value={dados.complexidade}
@@ -187,7 +190,7 @@ const CreateModel = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">BASE LEGAL PRINCIPAL</label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">{LABELS.BASE_LEGAL}</label>
                 <input
                   type="text"
                   placeholder="Ex: Art. 186 CC"

@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import { toast } from "../../components/Toast";
+import { validarSenhaForte } from "../../utils/validators";
+import PasswordStrength from "../../components/PasswordStrength";
+import { MESSAGES } from "../../utils/constants";
 
 const SignUp = () => {
   const [dados, setDados] = useState({
@@ -110,7 +114,7 @@ const SignUp = () => {
           cidade: data.localidade,
         }));
       } else {
-        alert("CEP não encontrado.");
+        toast.error("CEP não encontrado.");
       }
     } catch (error) {
       console.error("Erro ao buscar CEP", error);
@@ -122,24 +126,33 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (dados.email !== dados.confirmarEmail)
-      return alert("Os e-mails não coincidem!");
-    if (dados.senha !== dados.confirmarSenha)
-      return alert("As senhas não coincidem!");
+    if (dados.email !== dados.confirmarEmail) {
+      return toast.error("Os e-mails não coincidem!");
+    }
+    
+    if (dados.senha !== dados.confirmarSenha) {
+      return toast.error("As senhas não coincidem!");
+    }
+
+    // Validar força da senha
+    const validacaoSenha = validarSenhaForte(dados.senha);
+    if (!validacaoSenha.valida) {
+      return toast.error(validacaoSenha.mensagem);
+    }
 
     setLoading(true);
     try {
       const { confirmarEmail, confirmarSenha, ...dadosParaEnviar } = dados;
 
       await api.post("/auth/register", dadosParaEnviar);
-      alert("Advogado cadastrado com sucesso!");
-      navigate("/login");
+      toast.success("Advogado cadastrado com sucesso!");
+      setTimeout(() => navigate("/login"), 1000);
     } catch (error) {
       console.error('Erro completo:', error);
       const mensagem = error.code === 'ERR_NETWORK' 
         ? 'Erro ao conectar ao servidor. Verifique se o backend está ativo no Render.'
         : error.response?.data?.message || 'Erro ao realizar cadastro.';
-      alert(mensagem);
+      toast.error(mensagem);
     } finally {
       setLoading(false);
     }
@@ -239,10 +252,12 @@ const SignUp = () => {
                   type="password"
                   name="senha"
                   required
+                  minLength="8"
                   className="bg-slate-50 border p-4 rounded-2xl outline-none font-bold text-slate-700"
                   value={dados.senha}
                   onChange={handleChange}
                 />
+                <PasswordStrength password={dados.senha} />
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-black uppercase text-slate-400 ml-2">
@@ -252,6 +267,7 @@ const SignUp = () => {
                   type="password"
                   name="confirmarSenha"
                   required
+                  minLength="8"
                   className="bg-slate-50 border p-4 rounded-2xl outline-none font-bold text-slate-700"
                   value={dados.confirmarSenha}
                   onChange={handleChange}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../services/api";
 import { toast } from "../components/Toast";
+import logger from "../utils/logger";
 
 export const useFetch = (url, options = {}) => {
   const [data, setData] = useState(options.initialData || []);
@@ -19,8 +20,10 @@ export const useFetch = (url, options = {}) => {
         const response = await api.get(url);
         setData(response.data);
         setError(null);
+        logger.debug(`useFetch: Dados carregados com sucesso de ${url}`);
       } catch (err) {
         setError(err);
+        logger.error(`useFetch: Erro ao carregar dados de ${url}`, err);
         if (!options.silent) {
           toast.error(options.errorMessage || "Erro ao carregar dados");
         }

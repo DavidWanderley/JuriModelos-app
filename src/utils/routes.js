@@ -1,4 +1,3 @@
-// Constantes de rotas centralizadas para facilitar manutenção
 
 export const ROUTES = {
   // Públicas

@@ -1,8 +1,10 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "../pages/publicas/Login";
 import Home from "../pages/home/Home";
-import GenerateDocument from "../pages/generate/GenerateDocument";
-import GerarDocumento from "../pages/generate/GerarDocumento";
+import Templates from "../pages/templates/Templates";
+import CreateTemplate from "../pages/templates/CreateTemplate";
+import DetalhamentoTemplate from "../pages/templates/DetalhamentoTemplate";
+import GerarDocumento from "../pages/templates/GerarDocumento";
 import CreateModel from "../pages/modelos/CreateModel";
 import Modelos from "../pages/modelos/Modelos";
 import DetalhamentoModelo from "../pages/modelos/DetalhamentoModelo";
@@ -47,7 +49,16 @@ const AppRoutes = () => (
     />
 
     <Route
-      path="/gerar-documento"
+      path="/template/:id"
+      element={
+        <PrivateRoute>
+          <DetalhamentoTemplate />
+        </PrivateRoute>
+      }
+    />
+
+    <Route
+      path="/gerar-documento/:id"
       element={
         <PrivateRoute>
           <GerarDocumento />
@@ -69,6 +80,24 @@ const AppRoutes = () => (
       element={
         <PrivateRoute>
           <Historico />
+        </PrivateRoute>
+      }
+    />
+
+    <Route
+      path="/templates"
+      element={
+        <PrivateRoute>
+          <Templates />
+        </PrivateRoute>
+      }
+    />
+
+    <Route
+      path="/novo-template"
+      element={
+        <PrivateRoute>
+          <CreateTemplate />
         </PrivateRoute>
       }
     />
@@ -127,14 +156,7 @@ const AppRoutes = () => (
       }
     />
 
-    <Route
-      path="/generate/:id"
-      element={
-        <PrivateRoute>
-          <GenerateDocument />
-        </PrivateRoute>
-      }
-    />
+
 
     <Route
       path="*"

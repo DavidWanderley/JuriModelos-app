@@ -22,8 +22,8 @@ const Historico = () => {
   if (loading) return <div className="ml-44 pt-24 p-10 font-bold text-slate-500">Acessando arquivos da CW Advocacia...</div>;
 
   return (
-    <div className="ml-44 pt-24 p-10 bg-slate-50 min-h-screen">
-      <div className="max-w-6xl mx-auto">
+    <div className="bg-slate-50 min-h-screen">
+      <div className="max-w-6xl ml-10">
         <header className="mb-10">
           <h1 className="text-3xl font-black text-slate-800 tracking-tight">Histórico de Documentos</h1>
           <p className="text-slate-500 font-medium">Arquivo digital de petições e documentos gerados</p>

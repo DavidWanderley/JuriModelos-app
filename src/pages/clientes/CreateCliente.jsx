@@ -54,8 +54,8 @@ const CreateCliente = () => {
   const helperStyle = "text-[10px] text-slate-400 ml-1 italic font-medium";
 
   return (
-    <div className="ml-44 pt-24 p-10 bg-slate-50 min-h-screen">
-      <div className="max-w-6xl mx-auto">
+    <div className=" bg-slate-50 min-h-screen">
+      <div className="max-w-6xl ml-10">
         <header className="mb-10 flex justify-between items-center">
           <div className="text-left">
             <h1 className="text-3xl font-black text-slate-800 tracking-tight">Novo Cadastro</h1>

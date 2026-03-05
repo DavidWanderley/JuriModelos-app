@@ -87,14 +87,14 @@ const EditModel = () => {
 
   if (loading)
     return (
-      <div className="ml-44 pt-24 p-10 flex justify-center items-center h-screen">
+      <div className=" flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
       </div>
     );
 
   return (
-    <div className="ml-44 pt-24 p-10 bg-slate-50 min-h-screen">
-      <div className="max-w-5xl mx-auto bg-white p-12 rounded-[2.5rem] shadow-sm border border-slate-200">
+    <div className=" bg-slate-50 min-h-screen">
+      <div className="max-w-5xl ml-10 bg-white p-12 rounded-[2.5rem] shadow-sm border border-slate-200">
         <div className="mb-10 border-b pb-6">
           <h1 className="text-3xl font-black text-slate-800 tracking-tight">
             Editar Modelo

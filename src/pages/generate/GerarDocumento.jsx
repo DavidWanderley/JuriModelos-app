@@ -45,8 +45,8 @@ const GerarDocumento = () => {
   }
 
   return (
-    <div className="ml-64 pt-24 p-10 bg-slate-50 min-h-screen">
-      <div className="max-w-4xl mx-auto">
+    <div className="bg-slate-50 min-h-screen">
+      <div className="max-w-4xl ml-10">
         <header className="mb-10">
           <h1 className="text-3xl font-black text-slate-800">📝 Gerar Documento</h1>
           <p className="text-slate-500 font-medium">Selecione um modelo e um cliente para mesclar as informações</p>
@@ -54,7 +54,6 @@ const GerarDocumento = () => {
 
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 space-y-8">
           
-          {/* Seleção de Modelo */}
           <div>
             <label className="block text-sm font-black uppercase text-slate-400 mb-3">
               1. Escolha o Modelo Jurídico
@@ -73,7 +72,6 @@ const GerarDocumento = () => {
             </select>
           </div>
 
-          {/* Seleção de Cliente */}
           <div>
             <label className="block text-sm font-black uppercase text-slate-400 mb-3">
               2. Escolha o Cliente
@@ -92,7 +90,6 @@ const GerarDocumento = () => {
             </select>
           </div>
 
-          {/* Preview da Seleção */}
           {modeloSelecionado && clienteSelecionado && (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
               <h3 className="text-sm font-black uppercase text-amber-700 mb-3">✓ Pronto para Gerar</h3>
@@ -109,7 +106,6 @@ const GerarDocumento = () => {
             </div>
           )}
 
-          {/* Botões de Ação */}
           <div className="flex gap-4 pt-4">
             <button
               onClick={() => navigate("/")}
@@ -127,7 +123,6 @@ const GerarDocumento = () => {
           </div>
         </div>
 
-        {/* Cards Informativos */}
         <div className="grid grid-cols-2 gap-6 mt-8">
           <div className="bg-white rounded-2xl border border-slate-200 p-6">
             <div className="text-3xl mb-3">📋</div>

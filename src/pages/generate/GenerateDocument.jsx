@@ -133,14 +133,14 @@ const GenerateDocument = () => {
 
   if (loading)
     return (
-      <div className="ml-44 pt-24 p-10 font-bold text-slate-500">
+      <div className="font-bold text-slate-500">
         Analisando variáveis jurídicas...
       </div>
     );
 
   return (
-    <div className="ml-44 pt-24 p-10 bg-slate-50 min-h-screen">
-      <div className="max-w-5xl mx-auto mb-6">
+    <div className="bg-slate-50 min-h-screen">
+      <div className="max-w-5xl ml-10">
         <button
           onClick={() => navigate(`/modelo/${id}`)}
           className="text-slate-500 hover:text-slate-800 font-bold flex items-center gap-2 transition-all group"
@@ -152,7 +152,7 @@ const GenerateDocument = () => {
         </button>
       </div>
 
-      <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="max-w-5xl ml-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
         <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-200 h-fit">
           <header className="mb-8">
             <h1 className="text-2xl font-black text-slate-800 tracking-tight">

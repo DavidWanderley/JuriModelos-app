@@ -23,8 +23,8 @@ const Clientes = () => {
   }, []);
 
   return (
-    <div className="ml-44 pt-24 p-10 bg-slate-50 min-h-screen font-sans">
-      <div className="max-w-6xl mx-auto">
+    <div className="bg-slate-50 min-h-screen font-sans">
+      <div className="max-w-6xl ml-10">
         <header className="mb-8 flex justify-between items-end">
           <div className="text-left">
             <h1 className="text-3xl font-black text-slate-800 tracking-tight">Gestão de Clientes</h1>

@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import ModelCard from "../../components/ModelCard";
 
 const Modelos = () => {
   const [modelos, setModelos] = useState([]);
+  const [busca, setBusca] = useState("");
+  const [categoriaAtiva, setCategoriaAtiva] = useState("Todos");
+  const [complexidadeAtiva, setComplexidadeAtiva] = useState("Todas");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const perfil = localStorage.getItem("perfil");
@@ -22,6 +26,16 @@ const Modelos = () => {
     fetchModelos();
   }, []);
 
+  const modelosFiltrados = modelos.filter((m) => {
+    const matchBusca = m.titulo.toLowerCase().includes(busca.toLowerCase());
+    const matchCategoria = categoriaAtiva === "Todos" || m.categoria === categoriaAtiva;
+    const matchComplexidade = complexidadeAtiva === "Todas" || m.complexidade === complexidadeAtiva;
+    return matchBusca && matchCategoria && matchComplexidade;
+  });
+
+  const categorias = ["Todos", "Contratos", "Petições", "Recursos", "Pareceres"];
+  const complexidades = ["Todas", "Baixa", "Média", "Alta"];
+
   if (loading) {
     return (
       <div className="ml-64 pt-24 p-10 flex items-center justify-center min-h-screen">
@@ -31,11 +45,11 @@ const Modelos = () => {
   }
 
   return (
-    <div className="ml-64 pt-24 p-10 bg-slate-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
+    <div className="bg-slate-50 min-h-screen">
+      <div className="max-w-7xl ml-10">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-black text-slate-800">Biblioteca de Modelos</h1>
+            <h1 className="text-3xl font-black text-slate-800">📋 Biblioteca de Modelos</h1>
             <p className="text-slate-500 font-medium">Acervo jurídico da CW Advocacia</p>
           </div>
           {perfil === "admin" && (
@@ -48,31 +62,78 @@ const Modelos = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {modelos.map((modelo) => (
-            <div
-              key={modelo.id}
-              onClick={() => navigate(`/modelo/${modelo.id}`)}
-              className="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-xl hover:border-amber-400 transition-all cursor-pointer"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <span className="text-xs font-black uppercase text-slate-400 bg-slate-50 px-3 py-1 rounded-full">
-                  {modelo.categoria}
-                </span>
-                {modelo.pdf_url && <span className="text-red-600">📄</span>}
-              </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-3">{modelo.titulo}</h3>
-              <div className="flex gap-2 flex-wrap">
-                <span className="text-xs font-bold px-2 py-1 rounded-lg bg-blue-50 text-blue-700">
-                  {modelo.tipo_cliente === "PF" ? "Pessoa Física" : "Pessoa Jurídica"}
-                </span>
-                <span className="text-xs font-bold px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700">
-                  {modelo.complexidade}
-                </span>
-              </div>
-            </div>
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Busca Ativa</p>
+            <input
+              type="text"
+              placeholder="Buscar modelo..."
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              className="w-full mt-2 p-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-amber-500 font-bold text-slate-700"
+            />
+          </div>
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Total de Modelos</p>
+            <h2 className="text-3xl font-black text-[#0e1e3f]">{modelos.length}</h2>
+          </div>
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Filtrados</p>
+            <h2 className="text-3xl font-black text-amber-600">{modelosFiltrados.length}</h2>
+          </div>
         </div>
+
+        <div className="space-y-6 mb-8 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <div>
+            <span className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-3">Categoria</span>
+            <div className="flex gap-3 overflow-x-auto pb-2">
+              {categorias.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setCategoriaAtiva(cat)}
+                  className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${
+                    categoriaAtiva === cat ? "bg-[#0e1e3f] text-white shadow-lg" : "bg-slate-50 text-slate-500 hover:bg-slate-200"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <span className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-3">Complexidade</span>
+            <div className="flex gap-3">
+              {complexidades.map((comp) => (
+                <button
+                  key={comp}
+                  onClick={() => setComplexidadeAtiva(comp)}
+                  className={`px-5 py-2 rounded-lg text-sm font-bold transition-all border ${
+                    complexidadeAtiva === comp ? "bg-amber-500 border-amber-500 text-white shadow-md" : "bg-white border-slate-200 text-slate-500 hover:border-amber-500"
+                  }`}
+                >
+                  {comp}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {modelosFiltrados.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {modelosFiltrados.map((modelo) => (
+              <ModelCard
+                key={modelo.id}
+                modelo={modelo}
+                onSelect={() => navigate(`/modelo/${modelo.id}`)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl p-20 border-2 border-dashed border-slate-200 text-center">
+            <div className="text-5xl mb-4">🔍</div>
+            <p className="text-xl font-medium text-slate-400">Nenhum modelo encontrado com os filtros aplicados.</p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,11 +1,13 @@
 import React from "react";
 import AppRoutes from "./routers";
-
-import "./styles/App.css";
+import Toast, { useToast } from "./components/Toast";
 
 function App() {
+  const { toasts } = useToast();
+
   return (
     <div className="App">
+      <Toast toasts={toasts} />
       <AppRoutes />
     </div>
   );

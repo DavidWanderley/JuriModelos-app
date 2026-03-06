@@ -18,7 +18,7 @@ class Logger {
   constructor() {
     this.isDevelopment = import.meta.env.MODE === 'development';
     this.logs = [];
-    this.maxLogs = 100; // Manter apenas os últimos 100 logs
+    this.maxLogs = 100; 
   }
 
   _formatMessage(level, message, data) {
@@ -35,7 +35,7 @@ class Logger {
   _saveLog(logEntry) {
     this.logs.push(logEntry);
     if (this.logs.length > this.maxLogs) {
-      this.logs.shift(); // Remove o mais antigo
+      this.logs.shift(); 
     }
   }
 
@@ -62,7 +62,6 @@ class Logger {
     this._saveLog(logEntry);
     this._consoleLog(LOG_LEVELS.ERROR, message, data);
     
-    // Em produção, poderia enviar para serviço de monitoramento
     if (!this.isDevelopment) {
       this._sendToMonitoring(logEntry);
     }
@@ -81,7 +80,7 @@ class Logger {
   }
 
   debug(message, data = null) {
-    if (!this.isDevelopment) return; // Debug apenas em desenvolvimento
+    if (!this.isDevelopment) return; 
     
     const logEntry = this._formatMessage(LOG_LEVELS.DEBUG, message, data);
     this._saveLog(logEntry);
@@ -102,10 +101,12 @@ class Logger {
     const level = status >= 400 ? LOG_LEVELS.ERROR : LOG_LEVELS.DEBUG;
     const message = `API Response: ${method} ${url} - Status: ${status}`;
     
+    const safeData = this.isDevelopment ? data : null;
+    
     if (level === LOG_LEVELS.ERROR) {
-      this.error(message, data);
+      this.error(message, safeData);
     } else {
-      this.debug(message, data);
+      this.debug(message, safeData);
     }
   }
 
@@ -133,8 +134,7 @@ class Logger {
 
   // Enviar para serviço de monitoramento (placeholder)
   _sendToMonitoring(logEntry) {
-    // Aqui você poderia integrar com Sentry, LogRocket, etc.
-    // Exemplo: Sentry.captureException(logEntry);
+    
   }
 }
 

@@ -13,15 +13,16 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      await api.post("/auth/forgot-password", { email });
+      await api.post("/auth/forgot-password", { email }, { timeout: 60000 });
       setEnviado(true);
     } catch (error) {
       console.error('Erro forgot-password:', error.response?.data);
-      alert(
-        error.response?.data?.message || 
-        error.response?.data?.error ||
-        "Erro ao processar solicitação. Verifique se o e-mail está correto."
-      );
+      const mensagem = error.code === 'ECONNABORTED' 
+        ? "O servidor demorou muito para responder. Tente novamente em alguns segundos."
+        : error.response?.data?.message || 
+          error.response?.data?.error ||
+          "Erro ao processar solicitação. Verifique se o e-mail está correto.";
+      alert(mensagem);
     } finally {
       setLoading(false);
     }
@@ -63,7 +64,7 @@ const ForgotPassword = () => {
                 disabled={loading}
                 className="w-full bg-[#0e1e3f] text-white py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-slate-800 transition-all active:scale-95 disabled:opacity-50"
               >
-                {loading ? "ENVIANDO..." : "ENVIAR LINK DE RECUPERAÇÃO"}
+                {loading ? "ENVIANDO... (pode levar até 1 minuto)" : "ENVIAR LINK DE RECUPERAÇÃO"}
               </button>
             </form>
           </>

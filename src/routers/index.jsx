@@ -5,6 +5,7 @@ import Login from "../pages/publicas/Login";
 import Home from "../pages/home/Home";
 import Templates from "../pages/templates/Templates";
 import CreateTemplate from "../pages/templates/CreateTemplate";
+import EditTemplate from "../pages/templates/EditTemplate";
 import DetalhamentoTemplate from "../pages/templates/DetalhamentoTemplate";
 import GerarDocumento from "../pages/templates/GerarDocumento";
 import CreateModel from "../pages/modelos/CreateModel";
@@ -20,6 +21,7 @@ import ForgotPassword from "../pages/publicas/ForgotPassword";
 import ResetPassword from "../pages/publicas/ResetPassword";
 import Clientes from "../pages/clientes/Clientes";
 import CreateCliente from "../pages/clientes/CreateCliente";
+import EditCliente from "../pages/clientes/EditCliente";
 
 const isAuthenticated = () => storage.isAuthenticated();
 
@@ -75,6 +77,15 @@ const AppRoutes = () => (
     />
 
     <Route
+      path="/clientes/editar/:id"
+      element={
+        <PrivateRoute>
+          <EditCliente />
+        </PrivateRoute>
+      }
+    />
+
+    <Route
       path="/historico"
       element={
         <PrivateRoute>
@@ -97,6 +108,15 @@ const AppRoutes = () => (
       element={
         <PrivateRoute>
           <CreateTemplate />
+        </PrivateRoute>
+      }
+    />
+
+    <Route
+      path="/editar-template/:id"
+      element={
+        <PrivateRoute>
+          <EditTemplate />
         </PrivateRoute>
       }
     />

@@ -1,42 +1,67 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../../services/api";
 import { toast } from "../../components/Toast";
 import { MESSAGES } from "../../utils/constants";
+import Loading from "../../components/Loading";
 import BackButton from "../../components/BackButton";
 
-const CreateTemplate = () => {
+const EditTemplate = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
   const [form, setForm] = useState({
     titulo: "",
     conteudo: "",
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const fetchTemplate = async () => {
+      try {
+        const response = await api.get(`/templates/${id}`);
+        const template = response.data.data || response.data;
+        setForm({
+          titulo: template.titulo,
+          conteudo: template.conteudo,
+        });
+      } catch (error) {
+        toast.error(MESSAGES.ERROR.TEMPLATE_CARREGAR);
+        navigate("/templates");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTemplate();
+  }, [id, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setSaving(true);
 
     try {
-      await api.post("/templates", form);
-      toast.success(MESSAGES.SUCCESS.TEMPLATE_CRIADO);
-      setTimeout(() => navigate("/templates"), 1000);
+      await api.put(`/templates/${id}`, form);
+      toast.success(MESSAGES.SUCCESS.TEMPLATE_ATUALIZADO);
+      setTimeout(() => navigate(`/template/${id}`), 1000);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Erro ao criar template");
+      toast.error(error.response?.data?.message || MESSAGES.ERROR.TEMPLATE_ATUALIZAR);
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
+
+  if (loading) return <Loading message="Carregando template..." />;
 
   return (
     <div className="bg-slate-50 min-h-screen">
       <div className="max-w-5xl ml-10">
         <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-black text-slate-800">⚙️ Novo Template de Automação</h1>
-            <p className="text-slate-500 font-medium">Crie um modelo com chaves para geração automática</p>
-          </div>
-          <BackButton to="/templates" label="Voltar" />
+          <BackButton to={`/template/${id}`} label="Voltar para Detalhes" />
+        </div>
+
+        <div className="mb-6">
+          <h1 className="text-3xl font-black text-slate-800">✏️ Editar Template</h1>
+          <p className="text-slate-500 font-medium">Atualize o modelo de automação</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white p-10 rounded-3xl border border-slate-200 shadow-sm space-y-6">
@@ -82,20 +107,20 @@ const CreateTemplate = () => {
           <div className="flex gap-4">
             <button
               type="button"
-              onClick={() => navigate("/templates")}
+              onClick={() => navigate(`/template/${id}`)}
               className="flex-1 bg-slate-100 text-slate-700 py-4 rounded-xl font-bold hover:bg-slate-200 transition-all"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={saving}
               className="flex-1 bg-[#0e1e3f] text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {loading && (
+              {saving && (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
               )}
-              {loading ? "Salvando..." : "Criar Template"}
+              {saving ? "Salvando..." : "Salvar Alterações"}
             </button>
           </div>
         </form>
@@ -104,4 +129,4 @@ const CreateTemplate = () => {
   );
 };
 
-export default CreateTemplate;
+export default EditTemplate;

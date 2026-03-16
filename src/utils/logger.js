@@ -80,11 +80,7 @@ class Logger {
   }
 
   debug(message, data = null) {
-    if (!this.isDevelopment) return; 
-    
-    const logEntry = this._formatMessage(LOG_LEVELS.DEBUG, message, data);
-    this._saveLog(logEntry);
-    this._consoleLog(LOG_LEVELS.DEBUG, message, data);
+    return;
   }
 
   // Logs específicos para ações do usuário

@@ -6,9 +6,11 @@ import Loading from "../../components/Loading";
 
 const Clientes = () => {
   const navigate = useNavigate();
-  const { data: clientes, loading } = useFetch("/clientes", {
+  const { data: response, loading } = useFetch("/clientes", {
     errorMessage: "Erro ao carregar clientes"
   });
+
+  const clientes = response?.data || [];
 
   if (loading) return <Loading message="Carregando clientes..." />;
 
@@ -46,7 +48,12 @@ const Clientes = () => {
                     <td className="p-6 text-sm text-slate-500">{c.cpf_cnpj}</td>
                     <td className="p-6 text-sm text-slate-500">{c.cidade} - {c.estado}</td>
                     <td className="p-6 text-right">
-                      <button className="text-amber-600 font-bold text-xs hover:underline">EDITAR</button>
+                      <button 
+                        onClick={() => navigate(`/clientes/editar/${c.id}`)}
+                        className="text-amber-600 font-bold text-xs hover:underline"
+                      >
+                        EDITAR
+                      </button>
                     </td>
                   </tr>
                 ))

@@ -13,7 +13,7 @@ const Templates = () => {
     const fetchTemplates = async () => {
       try {
         const response = await api.get("/templates");
-        setTemplates(response.data);
+        setTemplates(response.data.data || []);
       } catch (error) {
         console.error("Erro ao carregar templates:", error);
       } finally {

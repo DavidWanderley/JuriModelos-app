@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { toast } from "../../components/Toast";
-import { MESSAGES } from "../../utils/constants";
+import { MESSAGES, CATEGORIAS } from "../../utils/constants";
 import BackButton from "../../components/BackButton";
 
 const CreateTemplate = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     titulo: "",
+    categoria: "",
     conteudo: "",
   });
   const [loading, setLoading] = useState(false);
@@ -60,6 +61,22 @@ const CreateTemplate = () => {
               onChange={(e) => setForm({ ...form, titulo: e.target.value })}
               className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-amber-500 font-bold text-slate-700"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">
+              Categoria *
+            </label>
+            <select
+              required
+              value={form.categoria}
+              onChange={(e) => setForm({ ...form, categoria: e.target.value })}
+              className="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-amber-500 font-bold text-slate-700 bg-white"
+            >
+              {CATEGORIAS.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
           </div>
 
           <div>

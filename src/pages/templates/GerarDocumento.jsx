@@ -26,11 +26,14 @@ export default function GerarDocumento() {
           api.get("/clientes")
         ]);
 
-        setTemplate(resTemplate.data);
-        setClientes(resClientes.data);
+        const templateData = resTemplate.data.data || resTemplate.data;
+        const clientesData = resClientes.data.data || resClientes.data;
+
+        setTemplate(templateData);
+        setClientes(clientesData);
 
         const regex = /{{(.*?)}}/g;
-        const matches = [...resTemplate.data.conteudo.matchAll(regex)].map((m) => m[1]);
+        const matches = [...templateData.conteudo.matchAll(regex)].map((m) => m[1]);
         const variaveisUnicas = [...new Set(matches)];
         setVariaveis(variaveisUnicas);
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { toast } from "../../components/Toast";
-import { MESSAGES } from "../../utils/constants";
+import { MESSAGES, CATEGORIAS } from "../../utils/constants";
 import { LABELS } from "../../utils/labels";
 
 const CreateModel = () => {
@@ -98,10 +98,9 @@ const CreateModel = () => {
                     setDados({ ...dados, categoria: e.target.value })
                   }
                 >
-                  <option value="Petições">Petições</option>
-                  <option value="Contratos">Contratos</option>
-                  <option value="Recursos">Recursos</option>
-                  <option value="Pareceres">Pareceres</option>
+                  {CATEGORIAS.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
                 </select>
               </div>
               <div>

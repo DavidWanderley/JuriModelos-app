@@ -1,6 +1,15 @@
 // URLs e Endpoints
 export const API_TIMEOUT = 30000;
 
+// Categorias de modelos e templates
+export const CATEGORIAS = [
+  "Petições",
+  "Contratos",
+  "Recursos",
+  "Pareceres",
+  "Outros",
+];
+
 // Mensagens de Sucesso
 export const MESSAGES = {
   SUCCESS: {

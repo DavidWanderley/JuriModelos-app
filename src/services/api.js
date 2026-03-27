@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { storage } from './storage';
-import logger from '../utils/logger'; 
+import logger from '../utils/logger';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
@@ -17,7 +17,6 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   
-  // Log da requisição
   logger.apiRequest(config.method.toUpperCase(), config.url, config.data);
   
   return config;
@@ -35,7 +34,6 @@ api.interceptors.response.use(
       storage.setToken(newToken);
     }
     
-    // Log da resposta
     logger.apiResponse(
       response.config.method.toUpperCase(),
       response.config.url,
@@ -53,7 +51,6 @@ api.interceptors.response.use(
     } else if (!error.response) {
       logger.error('Sem resposta do servidor', { message: error.message });
     } else {
-      // Log de erro da API
       logger.apiResponse(
         error.config?.method?.toUpperCase() || 'UNKNOWN',
         error.config?.url || 'UNKNOWN',

@@ -1,12 +1,19 @@
-// URLs e Endpoints
 export const API_TIMEOUT = 30000;
 
-// Mensagens de Sucesso
+export const CATEGORIAS = [
+  "Petições",
+  "Contratos",
+  "Recursos",
+  "Pareceres",
+  "Outros",
+];
+
 export const MESSAGES = {
   SUCCESS: {
     CLIENTE_CADASTRADO: "Cliente cadastrado com sucesso!",
     CLIENTE_ATUALIZADO: "Cliente atualizado com sucesso!",
     TEMPLATE_CRIADO: "Template criado com sucesso!",
+    TEMPLATE_ATUALIZADO: "Template atualizado com sucesso!",
     TEMPLATE_DELETADO: "Template removido com sucesso!",
     MODELO_CRIADO: "Modelo cadastrado com sucesso!",
     MODELO_DELETADO: "Modelo removido com sucesso!",
@@ -18,6 +25,7 @@ export const MESSAGES = {
     CLIENTE_SALVAR: "Erro ao salvar cliente. Verifique os dados e tente novamente.",
     CLIENTE_CARREGAR: "Erro ao carregar clientes.",
     TEMPLATE_CARREGAR: "Erro ao carregar template.",
+    TEMPLATE_ATUALIZAR: "Erro ao atualizar template.",
     TEMPLATE_DELETAR: "Erro ao excluir template.",
     MODELO_CARREGAR: "Erro ao carregar modelo.",
     MODELO_DELETAR: "Erro ao excluir modelo.",
@@ -41,7 +49,6 @@ export const MESSAGES = {
   }
 };
 
-// Estilos reutilizáveis
 export const STYLES = {
   INPUT: "p-4 bg-slate-50 rounded-2xl border border-slate-200 outline-none focus:ring-2 focus:ring-amber-500 font-bold text-slate-700 transition-all text-left",
   INPUT_ERROR: "p-4 bg-red-50 rounded-2xl border-2 border-red-300 outline-none focus:ring-2 focus:ring-red-500 font-bold text-slate-700 transition-all text-left",
@@ -53,7 +60,6 @@ export const STYLES = {
   BUTTON_DANGER: "bg-white border border-rose-200 text-rose-600 px-6 py-2 rounded-xl font-bold hover:bg-rose-50 transition-all",
 };
 
-// Regex patterns
 export const PATTERNS = {
   EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   ONLY_NUMBERS: /\D/g,

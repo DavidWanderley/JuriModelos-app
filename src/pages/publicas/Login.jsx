@@ -22,9 +22,8 @@ const Login = () => {
       });
 
       localStorage.setItem("token", response.data.token);
-      localStorage.setItem("perfil", response.data.user.perfil); 
-      localStorage.setItem("nome", response.data.user.nome); 
-      
+      localStorage.setItem("perfil", response.data.user.role?.name || 'advogado');
+      localStorage.setItem("nome", response.data.user.nome);
       localStorage.setItem("user", JSON.stringify(response.data.user));
 
       navigate("/");

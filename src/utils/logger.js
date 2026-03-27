@@ -1,5 +1,3 @@
-// Sistema de logs para o frontend
-
 const LOG_LEVELS = {
   ERROR: 'ERROR',
   WARN: 'WARN',
@@ -18,7 +16,7 @@ class Logger {
   constructor() {
     this.isDevelopment = import.meta.env.MODE === 'development';
     this.logs = [];
-    this.maxLogs = 100; 
+    this.maxLogs = 100;
   }
 
   _formatMessage(level, message, data) {
@@ -35,7 +33,7 @@ class Logger {
   _saveLog(logEntry) {
     this.logs.push(logEntry);
     if (this.logs.length > this.maxLogs) {
-      this.logs.shift(); 
+      this.logs.shift();
     }
   }
 
@@ -61,7 +59,6 @@ class Logger {
     const logEntry = this._formatMessage(LOG_LEVELS.ERROR, message, data);
     this._saveLog(logEntry);
     this._consoleLog(LOG_LEVELS.ERROR, message, data);
-    
     if (!this.isDevelopment) {
       this._sendToMonitoring(logEntry);
     }
@@ -80,19 +77,13 @@ class Logger {
   }
 
   debug(message, data = null) {
-    if (!this.isDevelopment) return; 
-    
-    const logEntry = this._formatMessage(LOG_LEVELS.DEBUG, message, data);
-    this._saveLog(logEntry);
-    this._consoleLog(LOG_LEVELS.DEBUG, message, data);
+    return;
   }
 
-  // Logs específicos para ações do usuário
   userAction(action, details = null) {
     this.info(`Ação do usuário: ${action}`, details);
   }
 
-  // Logs específicos para API
   apiRequest(method, url, data = null) {
     this.debug(`API Request: ${method} ${url}`, data);
   }
@@ -100,9 +91,7 @@ class Logger {
   apiResponse(method, url, status, data = null) {
     const level = status >= 400 ? LOG_LEVELS.ERROR : LOG_LEVELS.DEBUG;
     const message = `API Response: ${method} ${url} - Status: ${status}`;
-    
     const safeData = this.isDevelopment ? data : null;
-    
     if (level === LOG_LEVELS.ERROR) {
       this.error(message, safeData);
     } else {
@@ -110,17 +99,14 @@ class Logger {
     }
   }
 
-  // Obter todos os logs
   getLogs() {
     return this.logs;
   }
 
-  // Limpar logs
   clearLogs() {
     this.logs = [];
   }
 
-  // Exportar logs (útil para debug)
   exportLogs() {
     const logsJson = JSON.stringify(this.logs, null, 2);
     const blob = new Blob([logsJson], { type: 'application/json' });
@@ -132,13 +118,9 @@ class Logger {
     URL.revokeObjectURL(url);
   }
 
-  // Enviar para serviço de monitoramento (placeholder)
-  _sendToMonitoring(logEntry) {
-    
-  }
+  _sendToMonitoring(logEntry) {}
 }
 
-// Instância única (singleton)
 const logger = new Logger();
 
 export default logger;

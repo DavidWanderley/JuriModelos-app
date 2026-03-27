@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import { CATEGORIAS } from "../../utils/constants";
+
 import ModelCard from "../../components/ModelCard";
 
 const Modelos = () => {
@@ -33,7 +35,7 @@ const Modelos = () => {
     return matchBusca && matchCategoria && matchComplexidade;
   });
 
-  const categorias = ["Todos", "Contratos", "Petições", "Recursos", "Pareceres"];
+  const categorias = ["Todos", ...CATEGORIAS];
   const complexidades = ["Todas", "Baixa", "Média", "Alta"];
 
   if (loading) {

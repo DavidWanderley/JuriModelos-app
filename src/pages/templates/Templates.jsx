@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import { CATEGORIAS } from "../../utils/constants";
 
 const Templates = () => {
   const [templates, setTemplates] = useState([]);
   const [busca, setBusca] = useState("");
+  const [categoriaAtiva, setCategoriaAtiva] = useState("Todos");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const perfil = localStorage.getItem("perfil");
@@ -13,7 +15,7 @@ const Templates = () => {
     const fetchTemplates = async () => {
       try {
         const response = await api.get("/templates");
-        setTemplates(response.data);
+        setTemplates(response.data.data || []);
       } catch (error) {
         console.error("Erro ao carregar templates:", error);
       } finally {
@@ -23,9 +25,11 @@ const Templates = () => {
     fetchTemplates();
   }, []);
 
-  const templatesFiltrados = templates.filter((t) =>
-    t.titulo.toLowerCase().includes(busca.toLowerCase())
-  );
+  const templatesFiltrados = templates.filter((t) => {
+    const matchBusca = t.titulo.toLowerCase().includes(busca.toLowerCase());
+    const matchCategoria = categoriaAtiva === "Todos" || t.categoria === categoriaAtiva;
+    return matchBusca && matchCategoria;
+  });
 
   if (loading) {
     return (
@@ -53,7 +57,7 @@ const Templates = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
             <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Buscar Template</p>
             <input
@@ -67,6 +71,22 @@ const Templates = () => {
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
             <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Total de Templates</p>
             <h2 className="text-3xl font-black text-[#0e1e3f]">{templatesFiltrados.length}</h2>
+          </div>
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm col-span-1 md:col-span-3">
+            <span className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-3">Categoria</span>
+            <div className="flex gap-3 flex-wrap">
+              {["Todos", ...CATEGORIAS].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setCategoriaAtiva(cat)}
+                  className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${
+                    categoriaAtiva === cat ? "bg-[#0e1e3f] text-white shadow-lg" : "bg-slate-50 text-slate-500 hover:bg-slate-200"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

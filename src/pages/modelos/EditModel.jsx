@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import LegalEditor from "../../components/LegalEditor";
+import { CATEGORIAS } from "../../utils/constants";
 
 const modules = {
   toolbar: [
@@ -141,10 +142,9 @@ const EditModel = () => {
                 onChange={handleChange}
                 className="bg-slate-50 border border-slate-200 p-4 rounded-2xl font-bold"
               >
-                <option>Contratos</option>
-                <option>Petições</option>
-                <option>Recursos</option>
-                <option>Pareceres</option>
+                {CATEGORIAS.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
               </select>
             </div>
             <div className="flex flex-col gap-2">

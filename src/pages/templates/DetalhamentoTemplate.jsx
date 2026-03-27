@@ -18,7 +18,7 @@ const DetalhamentoTemplate = () => {
     const fetchTemplate = async () => {
       try {
         const response = await api.get(`/templates/${id}`);
-        setTemplate(response.data);
+        setTemplate(response.data.data || response.data);
       } catch (error) {
         toast.error(MESSAGES.ERROR.TEMPLATE_CARREGAR);
         navigate("/templates");

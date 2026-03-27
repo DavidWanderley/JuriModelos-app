@@ -1,16 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFetch } from "../../hooks/useFetch";
 import { ROUTES } from "../../utils/routes";
 import Loading from "../../components/Loading";
+import api from "../../services/api";
+import { toast } from "../../components/Toast";
 
 const Clientes = () => {
   const navigate = useNavigate();
-  const { data: response, loading } = useFetch("/clientes", {
+  const { data: response, loading, setData } = useFetch("/clientes", {
     errorMessage: "Erro ao carregar clientes"
   });
 
   const clientes = response?.data || [];
+
+  const handleDelete = async (id, nome) => {
+    if (!window.confirm(`Excluir o cliente "${nome}"? Esta ação não pode ser desfeita.`)) return;
+    try {
+      await api.delete(`/clientes/${id}`);
+      toast.success("Cliente excluído com sucesso!");
+      setData(prev => ({ ...prev, data: (prev?.data || []).filter(c => c.id !== id) }));
+    } catch {
+      toast.error("Erro ao excluir cliente.");
+    }
+  };
 
   if (loading) return <Loading message="Carregando clientes..." />;
 
@@ -48,12 +61,20 @@ const Clientes = () => {
                     <td className="p-6 text-sm text-slate-500">{c.cpf_cnpj}</td>
                     <td className="p-6 text-sm text-slate-500">{c.cidade} - {c.estado}</td>
                     <td className="p-6 text-right">
-                      <button 
-                        onClick={() => navigate(`/clientes/editar/${c.id}`)}
-                        className="text-amber-600 font-bold text-xs hover:underline"
-                      >
-                        EDITAR
-                      </button>
+                      <div className="flex items-center justify-end gap-4">
+                        <button 
+                          onClick={() => navigate(`/clientes/editar/${c.id}`)}
+                          className="text-amber-600 font-bold text-xs hover:underline"
+                        >
+                          EDITAR
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(c.id, c.nome_completo)}
+                          className="text-red-500 font-bold text-xs hover:underline"
+                        >
+                          EXCLUIR
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

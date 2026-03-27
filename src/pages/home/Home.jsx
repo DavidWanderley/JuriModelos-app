@@ -18,67 +18,74 @@ const Home = () => {
     return `${dia}/${mes}/${ano}`;
   };
 
+  const fetchDados = async () => {
+    try {
+      const [resProximos, resCompromissos, resStats, resModelos] = await Promise.all([
+        api.get("/eventos/proximos"),
+        api.get("/eventos", {
+          params: {
+            mes: new Date().getMonth() + 1,
+            ano: new Date().getFullYear(),
+          },
+        }),
+        api.get("/stats"),
+        api.get("/modelos"),
+      ]);
+
+      const proximos = resProximos.data?.data || resProximos.data || [];
+      const todos = resCompromissos.data?.data || resCompromissos.data || [];
+      const statsData = resStats.data?.data || resStats.data || {};
+      const modelos = resModelos.data?.data || resModelos.data || [];
+
+      setStats({
+        clientes: statsData.totalClientes ?? 0,
+        documentos: statsData.totalDocumentos ?? 0,
+        modelos: statsData.totalModelos ?? 0,
+      });
+
+      const hoje = new Date().toISOString().split("T")[0];
+
+      const audienciasModelo = modelos
+        .filter(m => m.data_audiencia && m.data_audiencia >= hoje)
+        .map(m => ({
+          id: `modelo-${m.id}`,
+          titulo: m.titulo,
+          tipo: "Audiência",
+          data: m.data_audiencia,
+          hora: m.hora_audiencia || "",
+          local: "",
+          descricao: m.descricao || "",
+          _origem: "modelo",
+        }));
+
+      const todasAudiencias = [
+        ...proximos.filter(e => e.tipo === "Audiência"),
+        ...audienciasModelo,
+      ].sort((a, b) => a.data.localeCompare(b.data)).slice(0, 3);
+
+      setProximasAudiencias(todasAudiencias);
+
+      const tiposCompromisso = ["Prazo", "Protocolo", "Reunião", "Atendimento", "Outros"];
+      setCompromissos(
+        todos
+          .filter(e => tiposCompromisso.includes(e.tipo) && e.status === "pendente")
+          .slice(0, 5)
+      );
+    } catch (err) {
+      console.error("Erro ao carregar dados:", err);
+    } finally {
+      setLoadingEventos(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchDados = async () => {
-      try {
-        const [resProximos, resCompromissos, resStats, resModelos] = await Promise.all([
-          api.get("/eventos/proximos"),
-          api.get("/eventos", {
-            params: {
-              mes: new Date().getMonth() + 1,
-              ano: new Date().getFullYear(),
-            },
-          }),
-          api.get("/stats"),
-          api.get("/modelos"),
-        ]);
-
-        const proximos = resProximos.data?.data || resProximos.data || [];
-        const todos = resCompromissos.data?.data || resCompromissos.data || [];
-        const statsData = resStats.data?.data || resStats.data || {};
-        const modelos = resModelos.data?.data || resModelos.data || [];
-
-        setStats({
-          clientes: statsData.totalClientes ?? 0,
-          documentos: statsData.totalDocumentos ?? 0,
-          modelos: statsData.totalModelos ?? 0,
-        });
-
-        const hoje = new Date().toISOString().split("T")[0];
-
-        const audienciasModelo = modelos
-          .filter(m => m.data_audiencia && m.data_audiencia >= hoje)
-          .map(m => ({
-            id: `modelo-${m.id}`,
-            titulo: m.titulo,
-            tipo: "Audiência",
-            data: m.data_audiencia,
-            hora: m.hora_audiencia || "",
-            local: "",
-            descricao: m.descricao || "",
-            _origem: "modelo",
-          }));
-
-        const todasAudiencias = [
-          ...proximos.filter(e => e.tipo === "Audiência"),
-          ...audienciasModelo,
-        ].sort((a, b) => a.data.localeCompare(b.data)).slice(0, 3);
-
-        setProximasAudiencias(todasAudiencias);
-
-        const tiposCompromisso = ["Prazo", "Protocolo", "Reunião", "Atendimento", "Outros"];
-        setCompromissos(
-          todos
-            .filter(e => tiposCompromisso.includes(e.tipo) && e.status === "pendente")
-            .slice(0, 5)
-        );
-      } catch (err) {
-        console.error("Erro ao carregar dados:", err);
-      } finally {
-        setLoadingEventos(false);
-      }
-    };
     fetchDados();
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") fetchDados();
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
   }, []);
 
   const atalhos = [

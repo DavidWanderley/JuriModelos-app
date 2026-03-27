@@ -9,6 +9,7 @@ const Header = () => {
   const [sinoAberto, setSinoAberto] = useState(false);
   const [notificacoes, setNotificacoes] = useState([]);
   const [loadingNotif, setLoadingNotif] = useState(false);
+  const [visto, setVisto] = useState(false);
   const sinoRef = useRef(null);
 
   const getInitials = (fullName) => {
@@ -100,11 +101,11 @@ const Header = () => {
       <div className="flex items-center gap-6">
         <div className="relative" ref={sinoRef}>
           <button
-            onClick={() => setSinoAberto((v) => !v)}
+            onClick={() => { setSinoAberto((v) => !v); setVisto(true); }}
             className="text-slate-400 hover:text-amber-600 transition-colors text-xl relative"
           >
             🔔
-            {notificacoes.length > 0 && (
+            {notificacoes.length > 0 && !visto && (
               <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 rounded-full border-2 border-white text-white text-[9px] font-black flex items-center justify-center px-0.5">
                 {notificacoes.length > 9 ? "9+" : notificacoes.length}
               </span>

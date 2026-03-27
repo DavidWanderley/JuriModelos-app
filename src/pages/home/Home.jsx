@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import { storage } from "../../services/storage";
 
 const Home = () => {
   const navigate = useNavigate();
-  const perfil = localStorage.getItem("perfil") || "Usuário";
-  const nomeUsuario = localStorage.getItem("nome") || "Colega";
+  const perfil = storage.getPerfil() || "user";
+  const nomeUsuario = storage.getNome() || "Colega";
 
   const [stats, setStats] = useState({ clientes: 0, documentos: 0, modelos: 0 });
   const [proximasAudiencias, setProximasAudiencias] = useState([]);

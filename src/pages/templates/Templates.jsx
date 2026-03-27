@@ -3,13 +3,15 @@ import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { CATEGORIAS } from "../../utils/constants";
 
+import { storage } from "../../services/storage";
+
 const Templates = () => {
   const [templates, setTemplates] = useState([]);
   const [busca, setBusca] = useState("");
   const [categoriaAtiva, setCategoriaAtiva] = useState("Todos");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const perfil = localStorage.getItem("perfil");
+  const perfil = storage.getPerfil();
 
   useEffect(() => {
     const fetchTemplates = async () => {

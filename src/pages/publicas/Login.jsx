@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
+import { storage } from "../../services/storage";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,15 +18,12 @@ const Login = () => {
     setError("");
 
     try {
-      const response = await api.post("/auth/login", {
-        email,
-        password,
-      });
+      const response = await api.post("/auth/login", { email, password });
 
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("perfil", response.data.user.role?.name || 'advogado');
-      localStorage.setItem("nome", response.data.user.nome);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
+      storage.setToken(response.data.token);
+      storage.setPerfil(response.data.user.role?.name || "advogado");
+      storage.setNome(response.data.user.nome);
+      storage.setUser(response.data.user);
 
       navigate("/");
     } catch (err) {

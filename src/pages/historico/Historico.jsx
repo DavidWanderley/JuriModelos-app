@@ -9,7 +9,7 @@ const Historico = () => {
     const fetchHistorico = async () => {
       try {
         const response = await api.get("/documentos/meus-documentos");
-        setDocumentos(response.data);
+        setDocumentos(Array.isArray(response.data) ? response.data : response.data?.data || []);
       } catch (error) {
         console.error("Erro ao carregar histórico:", error);
       } finally {

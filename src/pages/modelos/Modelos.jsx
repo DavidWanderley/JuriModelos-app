@@ -5,6 +5,8 @@ import { CATEGORIAS } from "../../utils/constants";
 
 import ModelCard from "../../components/ModelCard";
 
+import { storage } from "../../services/storage";
+
 const Modelos = () => {
   const [modelos, setModelos] = useState([]);
   const [busca, setBusca] = useState("");
@@ -12,13 +14,13 @@ const Modelos = () => {
   const [complexidadeAtiva, setComplexidadeAtiva] = useState("Todas");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const perfil = localStorage.getItem("perfil");
+  const perfil = storage.getPerfil();
 
   useEffect(() => {
     const fetchModelos = async () => {
       try {
         const response = await api.get("/modelos");
-        setModelos(response.data);
+        setModelos(response.data?.data || response.data || []);
       } catch (error) {
         console.error("Erro ao carregar modelos:", error);
       } finally {

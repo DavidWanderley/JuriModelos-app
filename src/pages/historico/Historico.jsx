@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
 const Historico = () => {
   const [documentos, setDocumentos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchHistorico = async () => {
@@ -47,7 +49,17 @@ const Historico = () => {
                       {new Date(doc.createdAt).toLocaleDateString('pt-BR')}
                     </td>
                     <td className="p-6 text-sm font-bold text-slate-700">
-                      {doc.nome_cliente || "Não informado"}
+                      {doc.cliente ? (
+                        <button
+                          onClick={() => navigate(`/clientes/editar/${doc.cliente.id}`)}
+                          className="text-amber-600 hover:underline font-bold text-left"
+                        >
+                          {doc.cliente.nome_completo}
+                          <span className="block text-[11px] text-slate-400 font-normal">{doc.cliente.cpf_cnpj}</span>
+                        </button>
+                      ) : (
+                        <span className="text-slate-400 font-normal">{doc.nome_cliente || "Não informado"}</span>
+                      )}
                     </td>
                     <td className="p-6 text-sm font-medium text-amber-600 italic">
                       {doc.modelo_titulo}

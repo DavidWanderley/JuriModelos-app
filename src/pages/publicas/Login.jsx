@@ -45,8 +45,8 @@ const Login = () => {
             JuriModelos
           </h1>
           <p className="mt-4 text-slate-300 text-xl font-light max-w-md">
-            Otimize sua prática jurídica com a inteligência da{" "}
-            <span className="text-white font-semibold">CW Advocacia</span>.
+            Otimize sua prática jurídica com a inteligência do{" "}
+            <span className="text-white font-semibold">JuriModelos</span>.
           </p>
         </div>
 
@@ -99,7 +99,7 @@ const Login = () => {
 
         <div className="text-sm text-slate-500 relative z-10 border-t border-white/10 pt-6">
           © 2026{" "}
-          <span className="text-slate-400 font-medium">CW Advocacia</span> •
+          <span className="text-slate-400 font-medium">JuriModelos</span> •
           Todos os direitos reservados.
         </div>
       </div>
@@ -132,7 +132,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all placeholder:text-slate-300"
-                placeholder="exemplo@cwadvocacia.com.br"
+                placeholder="exemplo@seuescritorio.com.br"
               />
             </div>
             <div>

@@ -21,7 +21,7 @@ const Historico = () => {
     fetchHistorico();
   }, []);
 
-  if (loading) return <div className="ml-44 pt-24 p-10 font-bold text-slate-500">Acessando arquivos da CW Advocacia...</div>;
+  if (loading) return <div className="ml-44 pt-24 p-10 font-bold text-slate-500">Carregando histórico...</div>;
 
   return (
     <div className="bg-slate-50 min-h-screen">

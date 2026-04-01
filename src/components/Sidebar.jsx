@@ -39,7 +39,7 @@ const Sidebar = () => {
       </nav>
 
       <div className="border-t border-slate-700 pt-5 text-sm text-slate-400 px-2 italic">
-        CW Advocacia
+        JuriModelos
       </div>
     </aside>
   );

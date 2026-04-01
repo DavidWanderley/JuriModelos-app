@@ -29,7 +29,7 @@ const DetalhamentoModelo = () => {
 
   const handleDelete = async () => {
     const confirmou = window.confirm(
-      "⚠️ ATENÇÃO: Deseja excluir este modelo do acervo da CW Advocacia? Esta ação é irreversível.",
+      "⚠️ ATENÇÃO: Deseja excluir este modelo? Esta ação é irreversível.",
     );
 
     if (confirmou) {

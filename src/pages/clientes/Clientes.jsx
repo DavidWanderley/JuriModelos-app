@@ -33,7 +33,7 @@ const Clientes = () => {
         <header className="mb-8 flex justify-between items-end">
           <div className="text-left">
             <h1 className="text-3xl font-black text-slate-800 tracking-tight">Gestão de Clientes</h1>
-            <p className="text-slate-500 font-medium italic">Arquivo digital da CW Advocacia</p>
+            <p className="text-slate-500 font-medium italic">Arquivo digital de clientes</p>
           </div>
           <button 
             onClick={() => navigate(ROUTES.CLIENTES_NOVO)}

@@ -101,7 +101,7 @@ const EditModel = () => {
             Editar Modelo
           </h1>
           <p className="text-slate-500 font-medium text-lg">
-            Atualize as informações do acervo da CW Advocacia.
+            Atualize as informações do acervo jurídico.
           </p>
         </div>
 

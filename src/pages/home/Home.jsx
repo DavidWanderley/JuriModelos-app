@@ -102,7 +102,7 @@ const Home = () => {
           <h1 className="text-4xl font-black text-slate-800 mb-2">
             Olá, {nomeUsuario.split(" ")[0]}! 👋
           </h1>
-          <p className="text-slate-500 text-lg font-medium">CW Advocacia - Dashboard Jurídico</p>
+          <p className="text-slate-500 text-lg font-medium">Dashboard Jurídico</p>
         </header>
 
         {/* Status do Perfil */}

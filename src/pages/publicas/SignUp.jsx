@@ -166,7 +166,7 @@ const SignUp = () => {
             Cadastro de Advogado
           </h1>
           <p className="text-slate-500 font-medium italic">
-            CW Advocacia - Gestão de Acervo
+            JuriModelos - Gestão de Acervo Jurídico
           </p>
         </header>
 

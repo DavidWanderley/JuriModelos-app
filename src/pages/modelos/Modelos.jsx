@@ -54,7 +54,7 @@ const Modelos = () => {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-black text-slate-800">📋 Biblioteca de Modelos</h1>
-            <p className="text-slate-500 font-medium">Acervo jurídico da CW Advocacia</p>
+            <p className="text-slate-500 font-medium">Acervo jurídico de modelos processuais</p>
           </div>
           {perfil === "admin" && (
             <button

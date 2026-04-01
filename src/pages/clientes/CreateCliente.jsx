@@ -141,7 +141,7 @@ const CreateCliente = () => {
         <header className="mb-10 flex justify-between items-center">
           <div className="text-left">
             <h1 className="text-3xl font-black text-slate-800 tracking-tight">Novo Cadastro</h1>
-            <p className="text-slate-500 font-medium italic">Qualificação completa para a base da CW Advocacia</p>
+            <p className="text-slate-500 font-medium italic">Qualificação completa do cliente</p>
           </div>
           <button onClick={() => navigate("/clientes")} className="text-slate-400 hover:text-slate-800 font-bold text-sm underline">
             CANCELAR E VOLTAR
@@ -343,7 +343,7 @@ const CreateCliente = () => {
             {loading && (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
             )}
-            {loading ? "SALVANDO..." : "SALVAR CLIENTE NA BASE DA CW ADVOCACIA"}
+            {loading ? "SALVANDO..." : "SALVAR CLIENTE"}
           </button>
         </form>
       </div>

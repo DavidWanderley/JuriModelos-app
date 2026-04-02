@@ -62,7 +62,10 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       logger.warn('Usuário não autenticado - redirecionando para login');
       storage.clear();
-      window.location.href = '/login';
+      // Só redireciona se não estiver já na página de login
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

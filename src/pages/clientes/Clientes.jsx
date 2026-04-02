@@ -3,16 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { useFetch } from "../../hooks/useFetch";
 import { ROUTES } from "../../utils/routes";
 import Loading from "../../components/Loading";
+import Pagination from "../../components/Pagination";
 import api from "../../services/api";
 import { toast } from "../../components/Toast";
 
+const POR_PAGINA = 10;
+
 const Clientes = () => {
   const navigate = useNavigate();
+  const [pagina, setPagina] = useState(1);
   const { data: response, loading, setData } = useFetch("/clientes", {
     errorMessage: "Erro ao carregar clientes"
   });
 
   const clientes = response?.data || [];
+  const totalPaginas = Math.ceil(clientes.length / POR_PAGINA);
+  const clientesPagina = clientes.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
 
   const handleDelete = async (id, nome) => {
     if (!window.confirm(`Excluir o cliente "${nome}"? Esta ação não pode ser desfeita.`)) return;
@@ -54,8 +60,8 @@ const Clientes = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {clientes.length > 0 ? (
-                clientes.map((c) => (
+              {clientesPagina.length > 0 ? (
+                clientesPagina.map((c) => (
                   <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="p-6 text-sm font-bold text-slate-700">{c.nome_completo}</td>
                     <td className="p-6 text-sm text-slate-500">{c.cpf_cnpj}</td>
@@ -86,6 +92,8 @@ const Clientes = () => {
             </tbody>
           </table>
         </div>
+
+        <Pagination paginaAtual={pagina} totalPaginas={totalPaginas} onPaginar={setPagina} />
       </div>
     </div>
   );

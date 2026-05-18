@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { storage } from "../../services/storage";
@@ -8,7 +9,6 @@ const Home = () => {
   const perfil = storage.getPerfil() || "user";
   const nomeUsuario = storage.getNome() || "Colega";
 
-  const [stats, setStats] = useState({ clientes: 0, documentos: 0, modelos: 0 });
   const [proximasAudiencias, setProximasAudiencias] = useState([]);
   const [compromissos, setCompromissos] = useState([]);
   const [loadingEventos, setLoadingEventos] = useState(true);
@@ -22,7 +22,7 @@ const Home = () => {
 
   const fetchDados = async () => {
     try {
-      const [resProximos, resCompromissos, resStats, resModelos] = await Promise.allSettled([
+      const [resProximos, resCompromissos, resModelos] = await Promise.allSettled([
         api.get("/eventos/proximos"),
         api.get("/eventos", {
           params: {
@@ -30,22 +30,13 @@ const Home = () => {
             ano: new Date().getFullYear(),
           },
         }),
-        api.get("/stats"),
         api.get("/modelos"),
       ]);
 
       const proximos = resProximos.status === 'fulfilled' ? (resProximos.value.data?.data || resProximos.value.data || []) : [];
       const todos = resCompromissos.status === 'fulfilled' ? (resCompromissos.value.data?.data || resCompromissos.value.data || []) : [];
-      const statsData = resStats.status === 'fulfilled' ? (resStats.value.data?.data || resStats.value.data || {}) : {};
       const modelos = resModelos.status === 'fulfilled' ? (resModelos.value.data?.data || resModelos.value.data || []) : [];
 
-      setStats({
-        clientes: statsData.totalClientes ?? 0,
-        documentos: statsData.totalDocumentos ?? 0,
-        modelos: statsData.totalModelos ?? 0,
-      });
-
-      // Gráfico: eventos por tipo no mês atual
       const contagemTipos = {};
       todos.forEach(e => {
         contagemTipos[e.tipo] = (contagemTipos[e.tipo] || 0) + 1;
@@ -56,7 +47,6 @@ const Home = () => {
           .map(([name, value]) => ({ name, value }))
       );
 
-      // Gráfico: documentos por mês (últimos 6 meses) via histórico
       let historico = [];
       try {
         const resHistorico = await api.get("/documentos/meus-documentos");
@@ -150,78 +140,41 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Cards de Estatísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-blue-100 text-sm font-semibold">Total de Clientes</p>
-              <span className="text-3xl">👥</span>
-            </div>
-            <h3 className="text-4xl font-black">{stats.clientes}</h3>
-          </div>
-
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-purple-100 text-sm font-semibold">Documentos Gerados</p>
-              <span className="text-3xl">📄</span>
-            </div>
-            <h3 className="text-4xl font-black">{stats.documentos}</h3>
-          </div>
-
-          <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-6 text-white shadow-lg">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-amber-100 text-sm font-semibold">Modelos Disponíveis</p>
-              <span className="text-3xl">📋</span>
-            </div>
-            <h3 className="text-4xl font-black">{stats.modelos}</h3>
-          </div>
-        </div>
-
         {/* Gráficos */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Gráfico: Documentos por Mês */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
             <h2 className="text-lg font-black text-slate-800 mb-4">📄 Documentos Gerados por Mês</h2>
-            <div className="flex items-end gap-2 h-36">
-              {docsPorMes.map((item, i) => {
-                const max = Math.max(...docsPorMes.map(d => d.documentos), 1);
-                const altura = item.documentos > 0 ? Math.max((item.documentos / max) * 100, 8) : 2;
-                return (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <span className="text-[10px] font-bold text-slate-500">{item.documentos > 0 ? item.documentos : ''}</span>
-                    <div
-                      className="w-full rounded-t-lg transition-all"
-                      style={{ height: `${altura}%`, backgroundColor: item.documentos > 0 ? '#0e1e3f' : '#e2e8f0' }}
-                    />
-                    <span className="text-[10px] text-slate-400 font-medium">{item.mes}</span>
-                  </div>
-                );
-              })}
-            </div>
+            <ResponsiveContainer width="100%" height={144}>
+              <BarChart data={docsPorMes} barCategoryGap="30%">
+                <XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                <YAxis hide allowDecimals={false} />
+                <Tooltip formatter={(v) => [v, 'Documentos']} cursor={{ fill: '#f1f5f9' }} />
+                <Bar dataKey="documentos" radius={[6, 6, 0, 0]}>
+                  {docsPorMes.map((item, i) => (
+                    <Cell key={i} fill={item.documentos > 0 ? '#0e1e3f' : '#e2e8f0'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
 
           {/* Gráfico: Eventos por Tipo */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
             <h2 className="text-lg font-black text-slate-800 mb-4">📊 Eventos por Tipo (Mês Atual)</h2>
             {eventosPorTipo.length > 0 ? (
-              <div className="space-y-3">
-                {eventosPorTipo.map((item, i) => {
-                  const total = eventosPorTipo.reduce((s, e) => s + e.value, 0);
-                  const pct = Math.round((item.value / total) * 100);
-                  const cores = ['#7c3aed','#ef4444','#f59e0b','#06b6d4','#f97316','#64748b'];
-                  return (
-                    <div key={i}>
-                      <div className="flex justify-between text-xs font-semibold text-slate-600 mb-1">
-                        <span>{item.name}</span>
-                        <span>{item.value} ({pct}%)</span>
-                      </div>
-                      <div className="w-full bg-slate-100 rounded-full h-2">
-                        <div className="h-2 rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: cores[i % 6] }} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <ResponsiveContainer width="100%" height={144}>
+                <BarChart data={eventosPorTipo} barCategoryGap="30%">
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis hide allowDecimals={false} />
+                  <Tooltip formatter={(v) => [v, 'Eventos']} cursor={{ fill: '#f1f5f9' }} />
+                  <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                    {eventosPorTipo.map((_, i) => (
+                      <Cell key={i} fill={['#7c3aed','#ef4444','#f59e0b','#06b6d4','#f97316','#64748b'][i % 6]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             ) : (
               <div className="flex items-center justify-center h-36 text-slate-400 text-sm font-medium">Nenhum evento cadastrado este mês</div>
             )}

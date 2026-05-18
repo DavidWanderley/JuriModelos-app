@@ -2,8 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { CATEGORIAS } from "../../utils/constants";
-
 import ModelCard from "../../components/ModelCard";
+import { storage } from "../../services/storage";
+import Pagination from "../../components/Pagination";
+
+const POR_PAGINA = 9;
 
 const Modelos = () => {
   const [modelos, setModelos] = useState([]);
@@ -11,14 +14,15 @@ const Modelos = () => {
   const [categoriaAtiva, setCategoriaAtiva] = useState("Todos");
   const [complexidadeAtiva, setComplexidadeAtiva] = useState("Todas");
   const [loading, setLoading] = useState(true);
+  const [pagina, setPagina] = useState(1);
   const navigate = useNavigate();
-  const perfil = localStorage.getItem("perfil");
+  const perfil = storage.getPerfil();
 
   useEffect(() => {
     const fetchModelos = async () => {
       try {
         const response = await api.get("/modelos");
-        setModelos(response.data);
+        setModelos(response.data?.data || response.data || []);
       } catch (error) {
         console.error("Erro ao carregar modelos:", error);
       } finally {
@@ -34,6 +38,9 @@ const Modelos = () => {
     const matchComplexidade = complexidadeAtiva === "Todas" || m.complexidade === complexidadeAtiva;
     return matchBusca && matchCategoria && matchComplexidade;
   });
+
+  const totalPaginas = Math.ceil(modelosFiltrados.length / POR_PAGINA);
+  const modelosPagina = modelosFiltrados.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
 
   const categorias = ["Todos", ...CATEGORIAS];
   const complexidades = ["Todas", "Baixa", "Média", "Alta"];
@@ -52,7 +59,7 @@ const Modelos = () => {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-black text-slate-800">📋 Biblioteca de Modelos</h1>
-            <p className="text-slate-500 font-medium">Acervo jurídico da CW Advocacia</p>
+            <p className="text-slate-500 font-medium">Acervo jurídico de modelos processuais</p>
           </div>
           {perfil === "admin" && (
             <button
@@ -122,7 +129,7 @@ const Modelos = () => {
 
         {modelosFiltrados.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {modelosFiltrados.map((modelo) => (
+            {modelosPagina.map((modelo) => (
               <ModelCard
                 key={modelo.id}
                 modelo={modelo}
@@ -136,6 +143,7 @@ const Modelos = () => {
             <p className="text-xl font-medium text-slate-400">Nenhum modelo encontrado com os filtros aplicados.</p>
           </div>
         )}
+        <Pagination paginaAtual={pagina} totalPaginas={totalPaginas} onPaginar={(p) => { setPagina(p); window.scrollTo(0,0); }} />
       </div>
     </div>
   );

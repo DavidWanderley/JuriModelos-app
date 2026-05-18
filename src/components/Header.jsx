@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { storage } from "../services/storage";
 
 const Header = () => {
   const navigate = useNavigate();
-  const nome = localStorage.getItem("nome") || "Usuário";
-  const perfil = localStorage.getItem("perfil") || "user";
+  const nome = storage.getNome() || "Usuário";
+  const perfil = storage.getPerfil() || "user";
   const [sinoAberto, setSinoAberto] = useState(false);
   const [notificacoes, setNotificacoes] = useState([]);
   const [loadingNotif, setLoadingNotif] = useState(false);
@@ -20,30 +21,30 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
+    storage.clear();
     navigate("/login");
   };
 
-  const hoje = new Date().toISOString().split("T")[0];
-  const amanha = new Date(Date.now() + 86400000).toISOString().split("T")[0];
-
-  const labelData = (data) => {
+  const labelData = (data, hoje, amanha) => {
     if (data === hoje) return "Hoje";
     if (data === amanha) return "Amanhã";
-    const [ano, mes, dia] = data.split("-");
+    const [, mes, dia] = data.split("-");
     return `${dia}/${mes}`;
   };
 
   const TIPO_CORES = {
-    "Audiência": "bg-purple-100 text-purple-700",
-    "Prazo":     "bg-red-100 text-red-700",
-    "Protocolo": "bg-orange-100 text-orange-700",
-    "Reunião":   "bg-cyan-100 text-cyan-700",
+    "Audiência":   "bg-purple-100 text-purple-700",
+    "Prazo":       "bg-red-100 text-red-700",
+    "Protocolo":   "bg-orange-100 text-orange-700",
+    "Reunião":     "bg-cyan-100 text-cyan-700",
     "Atendimento": "bg-blue-100 text-blue-700",
-    "modelo":    "bg-amber-100 text-amber-700",
+    "modelo":      "bg-amber-100 text-amber-700",
   };
 
   useEffect(() => {
+    const hoje = new Date().toISOString().split("T")[0];
+    const amanha = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+
     const fetchNotificacoes = async () => {
       setLoadingNotif(true);
       try {
@@ -69,11 +70,10 @@ const Header = () => {
             hora: m.hora_audiencia || "",
           }));
 
-        const todas = [...eventosHojeAmanha, ...audienciasModelo].sort((a, b) =>
-          a.data.localeCompare(b.data)
-        );
+        const todas = [...eventosHojeAmanha, ...audienciasModelo]
+          .sort((a, b) => a.data.localeCompare(b.data));
 
-        setNotificacoes(todas);
+        setNotificacoes(todas.map(n => ({ ...n, _hoje: hoje, _amanha: amanha })));
       } catch (e) {
         console.error("Erro ao buscar notificações:", e);
       } finally {
@@ -146,7 +146,7 @@ const Header = () => {
                         </span>
                       </div>
                       <p className="text-xs text-slate-400 mt-0.5">
-                        {labelData(n.data)}{n.hora ? ` · ${n.hora}` : ""}
+                        {labelData(n.data, n._hoje, n._amanha)}{n.hora ? ` · ${n.hora}` : ""}
                       </p>
                     </li>
                   ))}

@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import Pagination from "../../components/Pagination";
+
+const POR_PAGINA = 10;
 
 const Historico = () => {
   const [documentos, setDocumentos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pagina, setPagina] = useState(1);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchHistorico = async () => {
       try {
         const response = await api.get("/documentos/meus-documentos");
-        setDocumentos(response.data);
+        setDocumentos(Array.isArray(response.data) ? response.data : response.data?.data || []);
       } catch (error) {
         console.error("Erro ao carregar histórico:", error);
       } finally {
@@ -19,7 +25,10 @@ const Historico = () => {
     fetchHistorico();
   }, []);
 
-  if (loading) return <div className="ml-44 pt-24 p-10 font-bold text-slate-500">Acessando arquivos da CW Advocacia...</div>;
+  const totalPaginas = Math.ceil(documentos.length / POR_PAGINA);
+  const docsPagina = documentos.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
+
+  if (loading) return <div className="ml-44 pt-24 p-10 font-bold text-slate-500">Carregando histórico...</div>;
 
   return (
     <div className="bg-slate-50 min-h-screen">
@@ -40,14 +49,24 @@ const Historico = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {documentos.length > 0 ? (
-                documentos.map((doc) => (
+              {docsPagina.length > 0 ? (
+                docsPagina.map((doc) => (
                   <tr key={doc.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="p-6 text-sm font-medium text-slate-500">
                       {new Date(doc.createdAt).toLocaleDateString('pt-BR')}
                     </td>
                     <td className="p-6 text-sm font-bold text-slate-700">
-                      {doc.nome_cliente || "Não informado"}
+                      {doc.cliente ? (
+                        <button
+                          onClick={() => navigate(`/clientes/editar/${doc.cliente.id}`)}
+                          className="text-amber-600 hover:underline font-bold text-left"
+                        >
+                          {doc.cliente.nome_completo}
+                          <span className="block text-[11px] text-slate-400 font-normal">{doc.cliente.cpf_cnpj}</span>
+                        </button>
+                      ) : (
+                        <span className="text-slate-400 font-normal">{doc.nome_cliente || "Não informado"}</span>
+                      )}
                     </td>
                     <td className="p-6 text-sm font-medium text-amber-600 italic">
                       {doc.modelo_titulo}
@@ -74,6 +93,8 @@ const Historico = () => {
             </tbody>
           </table>
         </div>
+
+        <Pagination paginaAtual={pagina} totalPaginas={totalPaginas} onPaginar={setPagina} />
       </div>
     </div>
   );

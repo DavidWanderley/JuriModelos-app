@@ -16,6 +16,7 @@ export default function GerarDocumento() {
   const [documentoGerado, setDocumentoGerado] = useState("");
   const [loading, setLoading] = useState(true);
   const [clientes, setClientes] = useState([]);
+  const [clienteSelecionado, setClienteSelecionado] = useState(null);
   const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
@@ -52,9 +53,10 @@ export default function GerarDocumento() {
   }, [id, navigate]);
 
   const handleAutoPreencher = (clienteId) => {
-    if (!clienteId) return;
+    if (!clienteId) { setClienteSelecionado(null); return; }
     const cliente = clientes.find((c) => c.id === parseInt(clienteId));
     if (!cliente) return;
+    setClienteSelecionado(cliente);
 
     const mapa = {
       "nome_cliente": cliente.nome_completo,
@@ -113,6 +115,7 @@ export default function GerarDocumento() {
         nome_cliente: nomeIdentificado,
         conteudo_final: documentoGerado,
         modelo_titulo: template.titulo,
+        cliente_id: clienteSelecionado?.id || null,
       });
 
       const { downloadUrl } = response.data;

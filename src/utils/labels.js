@@ -106,7 +106,7 @@ export const LABELS = {
   TITULO_AGENDA: "Agenda",
 
   // Descrições
-  DESC_QUALIFICACAO: "Qualificação completa para a base da CW Advocacia",
+  DESC_QUALIFICACAO: "Qualificação completa do cliente",
   DESC_CHAVES_DINAMICAS: "Este template contém campos que serão preenchidos automaticamente com dados do cliente",
 
   // Outros

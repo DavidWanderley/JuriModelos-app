@@ -57,7 +57,7 @@ const CreateModel = () => {
             Engenharia de Modelo
           </h1>
           <p className="text-slate-500 text-lg font-medium">
-            Configurando inteligência para o acervo da CW Advocacia.
+            Configurando inteligência para o acervo jurídico.
           </p>
         </header>
 

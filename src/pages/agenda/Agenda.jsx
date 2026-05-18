@@ -289,9 +289,16 @@ export default function Agenda() {
                 {eventosDodiaSelecionado.map(ev => (
                   <div key={ev.id} className={`rounded-2xl p-3 border-l-4 ${ev._origem === "modelo" ? "border-amber-400 bg-amber-50" : "border-transparent bg-slate-50"} hover:bg-opacity-80 transition-colors`}>
                     <div className="flex items-start justify-between gap-2 mb-1.5">
-                      <p className="font-bold text-slate-800 text-sm leading-tight">{ev.titulo}</p>
+                      <p className={`font-bold text-sm leading-tight ${ev.status === 'concluido' ? 'line-through text-slate-400' : 'text-slate-800'}`}>{ev.titulo}</p>
                       {!ev._origem && (
                         <div className="flex gap-1 shrink-0">
+                          {ev.status !== 'concluido' && (
+                            <button
+                              onClick={async () => { await api.put(`/eventos/${ev.id}`, { ...ev, status: 'concluido' }); fetchEventos(); }}
+                              title="Marcar como concluído"
+                              className="text-slate-400 hover:text-green-500 transition-colors"
+                            >✅</button>
+                          )}
                           <button onClick={() => abrirEditar(ev)} className="text-slate-400 hover:text-amber-500 transition-colors">✏️</button>
                           <button onClick={() => deletar(ev.id)} className="text-slate-400 hover:text-red-500 transition-colors">🗑️</button>
                         </div>

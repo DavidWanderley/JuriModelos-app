@@ -1,83 +1,115 @@
 import React, { useState, useEffect } from "react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import { storage } from "../../services/storage";
 
 const Home = () => {
   const navigate = useNavigate();
-  const perfil = localStorage.getItem("perfil") || "Usuário";
-  const nomeUsuario = localStorage.getItem("nome") || "Colega";
+  const perfil = storage.getPerfil() || "user";
+  const nomeUsuario = storage.getNome() || "Colega";
 
-  const [stats, setStats] = useState({ clientes: 0, documentos: 0, modelos: 0 });
   const [proximasAudiencias, setProximasAudiencias] = useState([]);
   const [compromissos, setCompromissos] = useState([]);
   const [loadingEventos, setLoadingEventos] = useState(true);
+  const [docsPorMes, setDocsPorMes] = useState([]);
+  const [eventosPorTipo, setEventosPorTipo] = useState([]);
 
   const formatData = (dataStr) => {
     const [ano, mes, dia] = dataStr.split("-");
     return `${dia}/${mes}/${ano}`;
   };
 
-  useEffect(() => {
-    const fetchDados = async () => {
+  const fetchDados = async () => {
+    try {
+      const [resProximos, resCompromissos, resModelos] = await Promise.allSettled([
+        api.get("/eventos/proximos"),
+        api.get("/eventos", {
+          params: {
+            mes: new Date().getMonth() + 1,
+            ano: new Date().getFullYear(),
+          },
+        }),
+        api.get("/modelos"),
+      ]);
+
+      const proximos = resProximos.status === 'fulfilled' ? (resProximos.value.data?.data || resProximos.value.data || []) : [];
+      const todos = resCompromissos.status === 'fulfilled' ? (resCompromissos.value.data?.data || resCompromissos.value.data || []) : [];
+      const modelos = resModelos.status === 'fulfilled' ? (resModelos.value.data?.data || resModelos.value.data || []) : [];
+
+      const contagemTipos = {};
+      todos.forEach(e => {
+        contagemTipos[e.tipo] = (contagemTipos[e.tipo] || 0) + 1;
+      });
+      setEventosPorTipo(
+        Object.entries(contagemTipos)
+          .sort((a, b) => b[1] - a[1])
+          .map(([name, value]) => ({ name, value }))
+      );
+
+      let historico = [];
       try {
-        const [resProximos, resCompromissos, resStats, resModelos] = await Promise.all([
-          api.get("/eventos/proximos"),
-          api.get("/eventos", {
-            params: {
-              mes: new Date().getMonth() + 1,
-              ano: new Date().getFullYear(),
-            },
-          }),
-          api.get("/stats"),
-          api.get("/modelos"),
-        ]);
+        const resHistorico = await api.get("/documentos/meus-documentos");
+        historico = Array.isArray(resHistorico.data) ? resHistorico.data : resHistorico.data?.data || [];
+      } catch (_) {}
 
-        const proximos = resProximos.data?.data || resProximos.data || [];
-        const todos = resCompromissos.data?.data || resCompromissos.data || [];
-        const statsData = resStats.data?.data || resStats.data || {};
-        const modelos = resModelos.data?.data || resModelos.data || [];
-
-        setStats({
-          clientes: statsData.totalClientes ?? 0,
-          documentos: statsData.totalDocumentos ?? 0,
-          modelos: statsData.totalModelos ?? 0,
-        });
-
-        const hoje = new Date().toISOString().split("T")[0];
-
-        const audienciasModelo = modelos
-          .filter(m => m.data_audiencia && m.data_audiencia >= hoje)
-          .map(m => ({
-            id: `modelo-${m.id}`,
-            titulo: m.titulo,
-            tipo: "Audiência",
-            data: m.data_audiencia,
-            hora: m.hora_audiencia || "",
-            local: "",
-            descricao: m.descricao || "",
-            _origem: "modelo",
-          }));
-
-        const todasAudiencias = [
-          ...proximos.filter(e => e.tipo === "Audiência"),
-          ...audienciasModelo,
-        ].sort((a, b) => a.data.localeCompare(b.data)).slice(0, 3);
-
-        setProximasAudiencias(todasAudiencias);
-
-        const tiposCompromisso = ["Prazo", "Protocolo", "Reunião", "Atendimento", "Outros"];
-        setCompromissos(
-          todos
-            .filter(e => tiposCompromisso.includes(e.tipo) && e.status === "pendente")
-            .slice(0, 5)
-        );
-      } catch (err) {
-        console.error("Erro ao carregar dados:", err);
-      } finally {
-        setLoadingEventos(false);
+      const MESES = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+      const hoje = new Date();
+      const contagemMeses = {};
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+        const chave = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        contagemMeses[chave] = { mes: MESES[d.getMonth()], documentos: 0 };
       }
-    };
+      historico.forEach(doc => {
+        const chave = doc.createdAt?.slice(0, 7);
+        if (chave && contagemMeses[chave]) contagemMeses[chave].documentos += 1;
+      });
+      setDocsPorMes(Object.values(contagemMeses));
+
+      const hojeStr = hoje.toISOString().split("T")[0];
+
+      const audienciasModelo = modelos
+        .filter(m => m.data_audiencia && m.data_audiencia >= hojeStr)
+        .map(m => ({
+          id: `modelo-${m.id}`,
+          titulo: m.titulo,
+          tipo: "Audiência",
+          data: m.data_audiencia,
+          hora: m.hora_audiencia || "",
+          local: "",
+          descricao: m.descricao || "",
+          _origem: "modelo",
+        }));
+
+      const todasAudiencias = [
+        ...proximos.filter(e => e.tipo === "Audiência"),
+        ...audienciasModelo,
+      ].sort((a, b) => a.data.localeCompare(b.data)).slice(0, 3);
+
+      setProximasAudiencias(todasAudiencias);
+
+      const tiposCompromisso = ["Prazo", "Protocolo", "Reunião", "Atendimento", "Outros"];
+      setCompromissos(
+        todos
+          .filter(e => tiposCompromisso.includes(e.tipo) && e.status === "pendente")
+          .slice(0, 5)
+      );
+    } catch (err) {
+      console.error("Erro ao carregar dados:", err);
+    } finally {
+      setLoadingEventos(false);
+    }
+  };
+
+  useEffect(() => {
     fetchDados();
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") fetchDados();
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
   }, []);
 
   const atalhos = [
@@ -108,30 +140,44 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Cards de Estatísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-blue-100 text-sm font-semibold">Total de Clientes</p>
-              <span className="text-3xl">👥</span>
-            </div>
-            <h3 className="text-4xl font-black">{stats.clientes}</h3>
+        {/* Gráficos */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Gráfico: Documentos por Mês */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <h2 className="text-lg font-black text-slate-800 mb-4">📄 Documentos Gerados por Mês</h2>
+            <ResponsiveContainer width="100%" height={144}>
+              <BarChart data={docsPorMes} barCategoryGap="30%">
+                <XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                <YAxis hide allowDecimals={false} />
+                <Tooltip formatter={(v) => [v, 'Documentos']} cursor={{ fill: '#f1f5f9' }} />
+                <Bar dataKey="documentos" radius={[6, 6, 0, 0]}>
+                  {docsPorMes.map((item, i) => (
+                    <Cell key={i} fill={item.documentos > 0 ? '#0e1e3f' : '#e2e8f0'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-purple-100 text-sm font-semibold">Documentos Gerados</p>
-              <span className="text-3xl">📄</span>
-            </div>
-            <h3 className="text-4xl font-black">{stats.documentos}</h3>
-          </div>
-
-          <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-6 text-white shadow-lg">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-amber-100 text-sm font-semibold">Modelos Disponíveis</p>
-              <span className="text-3xl">📋</span>
-            </div>
-            <h3 className="text-4xl font-black">{stats.modelos}</h3>
+          {/* Gráfico: Eventos por Tipo */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <h2 className="text-lg font-black text-slate-800 mb-4">📊 Eventos por Tipo (Mês Atual)</h2>
+            {eventosPorTipo.length > 0 ? (
+              <ResponsiveContainer width="100%" height={144}>
+                <BarChart data={eventosPorTipo} barCategoryGap="30%">
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis hide allowDecimals={false} />
+                  <Tooltip formatter={(v) => [v, 'Eventos']} cursor={{ fill: '#f1f5f9' }} />
+                  <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                    {eventosPorTipo.map((_, i) => (
+                      <Cell key={i} fill={['#7c3aed','#ef4444','#f59e0b','#06b6d4','#f97316','#64748b'][i % 6]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-36 text-slate-400 text-sm font-medium">Nenhum evento cadastrado este mês</div>
+            )}
           </div>
         </div>
 

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
+import { storage } from "../../services/storage";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,15 +18,12 @@ const Login = () => {
     setError("");
 
     try {
-      const response = await api.post("/auth/login", {
-        email,
-        password,
-      });
+      const response = await api.post("/auth/login", { email, password });
 
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("perfil", response.data.user.role?.name || 'advogado');
-      localStorage.setItem("nome", response.data.user.nome);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
+      storage.setToken(response.data.token);
+      storage.setPerfil(response.data.user.role?.name || "advogado");
+      storage.setNome(response.data.user.nome);
+      storage.setUser(response.data.user);
 
       navigate("/");
     } catch (err) {
@@ -46,8 +45,8 @@ const Login = () => {
             JuriModelos
           </h1>
           <p className="mt-4 text-slate-300 text-xl font-light max-w-md">
-            Otimize sua prática jurídica com a inteligência da{" "}
-            <span className="text-white font-semibold">CW Advocacia</span>.
+            Otimize sua prática jurídica com a inteligência do{" "}
+            <span className="text-white font-semibold">JuriModelos</span>.
           </p>
         </div>
 
@@ -100,7 +99,7 @@ const Login = () => {
 
         <div className="text-sm text-slate-500 relative z-10 border-t border-white/10 pt-6">
           © 2026{" "}
-          <span className="text-slate-400 font-medium">CW Advocacia</span> •
+          <span className="text-slate-400 font-medium">JuriModelos</span> •
           Todos os direitos reservados.
         </div>
       </div>
@@ -112,9 +111,31 @@ const Login = () => {
           </div>
 
           <h2 className="text-4xl font-extrabold text-slate-900 mb-2">Login</h2>
-          <p className="text-slate-500 mb-10">
+          <p className="text-slate-500 mb-6">
             Insira suas credenciais para acessar o painel.
           </p>
+
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 text-sm text-slate-700">
+            <p className="font-bold text-amber-700 mb-1">🧪 Modo demonstração</p>
+            <p className="leading-relaxed">
+              Quer explorar a plataforma? Você pode{" "}
+              <button
+                type="button"
+                onClick={() => navigate("/criar-conta")}
+                className="text-amber-600 font-bold hover:underline"
+              >
+                criar sua própria conta
+              </button>{" "}
+              e testar o fluxo completo, ou entrar direto com o usuário de teste:
+            </p>
+            <button
+              type="button"
+              onClick={() => { setEmail("teste@teste.com"); setPassword("123"); }}
+              className="mt-3 w-full bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold py-2 rounded-lg transition-all text-xs tracking-wide"
+            >
+              Entrar como teste@teste.com · senha: 123
+            </button>
+          </div>
 
           {error && (
             <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-8 text-red-700 text-sm flex items-center gap-3">
@@ -133,7 +154,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all placeholder:text-slate-300"
-                placeholder="exemplo@cwadvocacia.com.br"
+                placeholder="exemplo@seuescritorio.com.br"
               />
             </div>
             <div>

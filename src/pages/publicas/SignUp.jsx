@@ -204,12 +204,11 @@ const SignUp = () => {
               </div>
               <div className="md:col-span-1 flex flex-col gap-1">
                 <label className="text-[10px] font-black uppercase text-slate-400 ml-2">
-                  OAB *
+                  OAB
                 </label>
                 <input
                   type="text"
                   name="oab"
-                  required
                   className="bg-slate-50 border p-4 rounded-2xl outline-none font-bold text-slate-700"
                   value={dados.oab}
                   onChange={handleChange}

@@ -22,6 +22,7 @@ import ResetPassword from "../pages/publicas/ResetPassword";
 import Clientes from "../pages/clientes/Clientes";
 import CreateCliente from "../pages/clientes/CreateCliente";
 import EditCliente from "../pages/clientes/EditCliente";
+import Prazos from "../pages/prazos/Prazos";
 
 const isAuthenticated = () => storage.isAuthenticated();
 
@@ -171,6 +172,15 @@ const AppRoutes = () => (
       element={
         <PrivateRoute>
           <EditModel />
+        </PrivateRoute>
+      }
+    />
+
+    <Route
+      path="/prazos"
+      element={
+        <PrivateRoute>
+          <Prazos />
         </PrivateRoute>
       }
     />

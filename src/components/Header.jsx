@@ -9,8 +9,8 @@ const Header = () => {
   const perfil = storage.getPerfil() || "user";
   const [sinoAberto, setSinoAberto] = useState(false);
   const [notificacoes, setNotificacoes] = useState([]);
+  const [naoLidas, setNaoLidas] = useState(0);
   const [loadingNotif, setLoadingNotif] = useState(false);
-  const [visto, setVisto] = useState(false);
   const sinoRef = useRef(null);
 
   const getInitials = (fullName) => {
@@ -25,62 +25,49 @@ const Header = () => {
     navigate("/login");
   };
 
-  const labelData = (data, hoje, amanha) => {
-    if (data === hoje) return "Hoje";
-    if (data === amanha) return "Amanhã";
-    const [, mes, dia] = data.split("-");
+  const marcarTodasLidas = async () => {
+    try {
+      await api.patch("/notificacoes/ler-todas");
+      setNaoLidas(0);
+      setNotificacoes(prev => prev.map(n => ({ ...n, lida: true })));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const marcarLida = async (id) => {
+    try {
+      await api.patch(`/notificacoes/${id}/ler`);
+      setNotificacoes(prev => prev.map(n => n.id === id ? { ...n, lida: true } : n));
+      setNaoLidas(prev => Math.max(0, prev - 1));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const labelData = (data) => {
+    const hoje  = new Date().toISOString().split('T')[0];
+    const d1    = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+    if (data === hoje) return 'Hoje';
+    if (data === d1)   return 'Amanhã';
+    const [, mes, dia] = data.split('-');
     return `${dia}/${mes}`;
   };
 
-  const TIPO_CORES = {
-    "Audiência":   "bg-purple-100 text-purple-700",
-    "Prazo":       "bg-red-100 text-red-700",
-    "Protocolo":   "bg-orange-100 text-orange-700",
-    "Reunião":     "bg-cyan-100 text-cyan-700",
-    "Atendimento": "bg-blue-100 text-blue-700",
-    "modelo":      "bg-amber-100 text-amber-700",
-  };
-
   useEffect(() => {
-    const hoje = new Date().toISOString().split("T")[0];
-    const amanha = new Date(Date.now() + 86400000).toISOString().split("T")[0];
-
     const fetchNotificacoes = async () => {
       setLoadingNotif(true);
       try {
-        const [resEventos, resModelos] = await Promise.all([
-          api.get("/eventos/proximos"),
-          api.get("/modelos"),
-        ]);
-
-        const eventos = resEventos.data?.data || resEventos.data || [];
-        const modelos = resModelos.data?.data || resModelos.data || [];
-
-        const eventosHojeAmanha = eventos.filter(
-          (e) => e.data === hoje || e.data === amanha
-        );
-
-        const audienciasModelo = modelos
-          .filter((m) => m.data_audiencia === hoje || m.data_audiencia === amanha)
-          .map((m) => ({
-            id: `modelo-${m.id}`,
-            titulo: m.titulo,
-            tipo: "modelo",
-            data: m.data_audiencia,
-            hora: m.hora_audiencia || "",
-          }));
-
-        const todas = [...eventosHojeAmanha, ...audienciasModelo]
-          .sort((a, b) => a.data.localeCompare(b.data));
-
-        setNotificacoes(todas.map(n => ({ ...n, _hoje: hoje, _amanha: amanha })));
+        const res = await api.get("/notificacoes");
+        const data = res.data?.data || res.data || {};
+        setNotificacoes(data.notificacoes || []);
+        setNaoLidas(data.naoLidas || 0);
       } catch (e) {
         console.error("Erro ao buscar notificações:", e);
       } finally {
         setLoadingNotif(false);
       }
     };
-
     fetchNotificacoes();
   }, []);
 
@@ -101,13 +88,13 @@ const Header = () => {
       <div className="flex items-center gap-6">
         <div className="relative" ref={sinoRef}>
           <button
-            onClick={() => { setSinoAberto((v) => !v); setVisto(true); }}
+            onClick={() => { setSinoAberto((v) => !v); }}
             className="text-slate-400 hover:text-amber-600 transition-colors text-xl relative"
           >
             🔔
-            {notificacoes.length > 0 && !visto && (
+            {naoLidas > 0 && (
               <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 rounded-full border-2 border-white text-white text-[9px] font-black flex items-center justify-center px-0.5">
-                {notificacoes.length > 9 ? "9+" : notificacoes.length}
+                {naoLidas > 9 ? "9+" : naoLidas}
               </span>
             )}
           </button>
@@ -115,13 +102,18 @@ const Header = () => {
           {sinoAberto && (
             <div className="absolute right-0 top-10 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 z-50 overflow-hidden">
               <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-                <h3 className="font-black text-slate-800 text-sm">Notificações</h3>
-                <button
-                  onClick={() => { setSinoAberto(false); navigate("/agenda"); }}
-                  className="text-xs text-amber-600 hover:text-amber-700 font-semibold"
-                >
-                  Ver agenda →
-                </button>
+                <h3 className="font-black text-slate-800 text-sm">Notificações {naoLidas > 0 && <span className="text-red-500">({naoLidas})</span>}</h3>
+                <div className="flex gap-3">
+                  {naoLidas > 0 && (
+                    <button onClick={marcarTodasLidas} className="text-xs text-slate-400 hover:text-slate-600 font-semibold">Marcar todas</button>
+                  )}
+                  <button
+                    onClick={() => { setSinoAberto(false); navigate("/prazos"); }}
+                    className="text-xs text-amber-600 hover:text-amber-700 font-semibold"
+                  >
+                    Ver prazos →
+                  </button>
+                </div>
               </div>
 
               {loadingNotif ? (
@@ -136,18 +128,22 @@ const Header = () => {
               ) : (
                 <ul className="max-h-80 overflow-y-auto divide-y divide-slate-50">
                   {notificacoes.map((n) => (
-                    <li key={n.id} className="px-4 py-3 hover:bg-slate-50 transition-colors">
+                    <li
+                      key={n.id}
+                      onClick={() => marcarLida(n.id)}
+                      className={`px-4 py-3 hover:bg-slate-50 transition-colors cursor-pointer ${
+                        !n.lida ? 'bg-amber-50/50' : ''
+                      }`}
+                    >
                       <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm font-semibold text-slate-800 leading-tight flex-1">{n.titulo}</p>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
-                          TIPO_CORES[n.tipo] || "bg-slate-100 text-slate-600"
-                        }`}>
-                          {n.tipo === "modelo" ? "Modelo" : n.tipo}
-                        </span>
+                        <p className="text-sm font-semibold text-slate-800 leading-tight flex-1">{n.mensagem}</p>
+                        {!n.lida && <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0 mt-1" />}
                       </div>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        {labelData(n.data, n._hoje, n._amanha)}{n.hora ? ` · ${n.hora}` : ""}
-                      </p>
+                      {n.prazo && (
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          {labelData(n.prazo.data_prazo)}{n.prazo.numero_processo ? ` · Proc. ${n.prazo.numero_processo}` : ''}
+                        </p>
+                      )}
                     </li>
                   ))}
                 </ul>

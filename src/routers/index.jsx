@@ -23,6 +23,9 @@ import Clientes from "../pages/clientes/Clientes";
 import CreateCliente from "../pages/clientes/CreateCliente";
 import EditCliente from "../pages/clientes/EditCliente";
 import Prazos from "../pages/prazos/Prazos";
+import Processos from "../pages/processos/Processos";
+import DetalhamentoProcesso from "../pages/processos/DetalhamentoProcesso";
+import FormProcesso from "../pages/processos/FormProcesso";
 
 const isAuthenticated = () => storage.isAuthenticated();
 
@@ -184,6 +187,11 @@ const AppRoutes = () => (
         </PrivateRoute>
       }
     />
+
+    <Route path="/processos" element={<PrivateRoute><Processos /></PrivateRoute>} />
+    <Route path="/processos/novo" element={<PrivateRoute><FormProcesso /></PrivateRoute>} />
+    <Route path="/processos/:id" element={<PrivateRoute><DetalhamentoProcesso /></PrivateRoute>} />
+    <Route path="/processos/:id/editar" element={<PrivateRoute><FormProcesso /></PrivateRoute>} />
 
 
 

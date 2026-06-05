@@ -10,7 +10,8 @@ const Sidebar = () => {
     { name: "Clientes", icon: "👥", path: "/clientes" },
     { name: "Histórico Digital", icon: "📂", path: "/historico" },
     { name: "Agenda", icon: "📅", path: "/agenda" },
-    { name: "Prazos", icon: "⚖️", path: "/prazos" },
+    { name: "Prazos",     icon: "⚖️", path: "/prazos" },
+    { name: "Processos",  icon: "📁", path: "/processos" },
   ];
 
   return (
